@@ -11,7 +11,6 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: "Missing latitude or longitude" }, { status: 400 })
     }
 
-    // 👇 Use Render backend URL here
     const apiRes = await fetch(
       `https://weather-api.onrender.com/api/weather?lat=${lat}&lon=${lon}`,
       { cache: "no-store" }
