@@ -12,7 +12,7 @@ export async function GET(request: NextRequest) {
     }
 
     const apiRes = await fetch(
-      `https://weather-api.onrender.com/api/weather?lat=${lat}&lon=${lon}`,
+      `https://project-wise.onrender.com/api/weather?lat=${lat}&lon=${lon}`,
       { cache: "no-store" }
     )
 
