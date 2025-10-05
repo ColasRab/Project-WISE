@@ -1,7 +1,6 @@
 services:
   - type: web
     name: weather-api
-    env: python
+    runtime: python
     buildCommand: pip install -r python/requirements.txt
-    startCommand: uvicorn python.weather_service:app --host 0.0.0.0 --port $PORT
-    healthCheckPath: /health
+    startCommand: cd python && uvicorn weather_service:app --host 0.0.0.0 --port $PORT
