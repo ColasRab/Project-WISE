@@ -1,3 +1,4 @@
+// app/api/weather/route.ts
 import { type NextRequest, NextResponse } from "next/server"
 
 export async function GET(request: NextRequest) {
@@ -10,10 +11,11 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: "Missing latitude or longitude" }, { status: 400 })
     }
 
-    const apiBase = process.env.NEXT_PUBLIC_API_URL || "https://weather-api.onrender.com";
-
-    const apiRes = await fetch(`${apiBase}/api/weather?lat=${lat}&lon=${lon}`);
-
+    // 👇 Use Render backend URL here
+    const apiRes = await fetch(
+      `https://weather-api.onrender.com/api/weather?lat=${lat}&lon=${lon}`,
+      { cache: "no-store" }
+    )
 
     if (!apiRes.ok) {
       throw new Error(`Backend API returned ${apiRes.status}`)
