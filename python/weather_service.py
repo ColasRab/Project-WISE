@@ -50,6 +50,13 @@ def get_forecast(lat: float = Query(..., description="Latitude"),
     Example: /api/weather?lat=14.5995&lon=120.9842
     """
     
+    # Generate mock weather data based on location
+    # In production, this would come from your Prophet models
+    wind_speed = round(5 + random.uniform(-2, 5), 2)
+    precip = round(max(0, 2 + random.uniform(-1, 8)), 2)
+    temp = round(25 + random.uniform(-5, 10), 2)
+    humidity = round(max(30, min(90, 65 + random.uniform(-15, 20))), 2)
+    
     # Assessment functions
     def assess_wind(speed):
         if speed < 3:
@@ -91,6 +98,7 @@ def get_forecast(lat: float = Query(..., description="Latitude"),
         else:
             return {"category": "Hot", "severity": 0.7, "safe": True}
     
+    # Calculate assessments
     wind_assessment = assess_wind(wind_speed)
     precip_assessment = assess_precip(precip)
     humidity_assessment = assess_humidity(humidity)
@@ -132,56 +140,56 @@ def get_forecast(lat: float = Query(..., description="Latitude"),
         },
         "fuzzy_probabilities": {
             "wind": {
-                "calm_percent": 20,
-                "breezy_percent": 40,
-                "windy_percent": 30,
-                "very_windy_percent": 10,
+                "calm_percent": 20.0,
+                "breezy_percent": 40.0,
+                "windy_percent": 30.0,
+                "very_windy_percent": 10.0,
                 "most_likely": wind_assessment["category"]
             },
             "precipitation": {
-                "dry_percent": 30,
-                "light_rain_percent": 35,
-                "moderate_rain_percent": 25,
-                "heavy_rain_percent": 10,
+                "dry_percent": 30.0,
+                "light_rain_percent": 35.0,
+                "moderate_rain_percent": 25.0,
+                "heavy_rain_percent": 10.0,
                 "most_likely": precip_assessment["category"]
             }
         },
         "statistics": {
             "wind": {
-                "mean": wind_speed,
+                "mean": round(wind_speed, 2),
                 "std": 2.5,
-                "min": max(0, wind_speed - 3),
-                "max": wind_speed + 3,
-                "p25": wind_speed - 1,
-                "p75": wind_speed + 1,
-                "p90": wind_speed + 2
+                "min": round(max(0, wind_speed - 3), 2),
+                "max": round(wind_speed + 3, 2),
+                "p25": round(wind_speed - 1, 2),
+                "p75": round(wind_speed + 1, 2),
+                "p90": round(wind_speed + 2, 2)
             },
             "precipitation": {
-                "mean": precip,
+                "mean": round(precip, 2),
                 "std": 1.5,
-                "min": max(0, precip - 2),
-                "max": precip + 2,
-                "p25": max(0, precip - 1),
-                "p75": precip + 1,
-                "p90": precip + 1.5
+                "min": round(max(0, precip - 2), 2),
+                "max": round(precip + 2, 2),
+                "p25": round(max(0, precip - 1), 2),
+                "p75": round(precip + 1, 2),
+                "p90": round(precip + 1.5, 2)
             },
             "temperature": {
-                "mean": temp,
+                "mean": round(temp, 2),
                 "std": 3.0,
-                "min": temp - 4,
-                "max": temp + 4,
-                "p25": temp - 2,
-                "p75": temp + 2,
-                "p90": temp + 3
+                "min": round(temp - 4, 2),
+                "max": round(temp + 4, 2),
+                "p25": round(temp - 2, 2),
+                "p75": round(temp + 2, 2),
+                "p90": round(temp + 3, 2)
             },
             "humidity": {
-                "mean": humidity,
+                "mean": round(humidity, 2),
                 "std": 10.0,
-                "min": max(0, humidity - 15),
-                "max": min(100, humidity + 15),
-                "p25": humidity - 5,
-                "p75": humidity + 5,
-                "p90": humidity + 10
+                "min": round(max(0, humidity - 15), 2),
+                "max": round(min(100, humidity + 15), 2),
+                "p25": round(humidity - 5, 2),
+                "p75": round(humidity + 5, 2),
+                "p90": round(humidity + 10, 2)
             }
         }
     }
