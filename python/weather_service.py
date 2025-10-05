@@ -3,7 +3,7 @@
 from fastapi import FastAPI, Query
 from fastapi.middleware.cors import CORSMiddleware
 from weather_module import WeatherAPI
-import json
+import os
 
 app = FastAPI()
 
@@ -19,15 +19,20 @@ app.add_middleware(
 api = None
 
 @app.on_event("startup")
-def load_weather_model():
+async def load_weather_model():
     global api
-    api = WeatherAPI(
-        "data/processed/wind_u.csv",
-        "data/processed/wind_v.csv",
-        "data/processed/precipitation.csv",
-        "data/processed/temperature.csv",
-        "data/processed/humidity.csv"
-    )
+    print("Loading weather model...")
+    try:
+        api = WeatherAPI(
+            "data/processed/wind_u.csv",
+            "data/processed/wind_v.csv",
+            "data/processed/precipitation.csv",
+            "data/processed/temperature.csv",
+            "data/processed/humidity.csv"
+        )
+        print("Weather model loaded successfully!")
+    except Exception as e:
+        print(f"Error loading weather model: {e}")
 
 @app.get("/")
 def root():
@@ -35,7 +40,7 @@ def root():
 
 @app.get("/health")
 def health():
-    return {"status": "healthy"}
+    return {"status": "healthy", "api_loaded": api is not None}
 
 @app.get("/api/weather")
 def get_forecast(lat: float = Query(...), lon: float = Query(...)):
@@ -103,3 +108,10 @@ def get_forecast(lat: float = Query(...), lon: float = Query(...)):
         return {"error": "No forecast available"}
     except Exception as e:
         return {"error": f"Error generating forecast: {str(e)}"}
+
+# This is critical for Render deployment
+if __name__ == "__main__":
+    import uvicorn
+    port = int(os.environ.get("PORT", 8000))
+    print(f"Starting server on port {port}")
+    uvicorn.run(app, host="0.0.0.0", port=port)

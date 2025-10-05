@@ -4,7 +4,7 @@ services:
     env: python
     region: oregon
     buildCommand: "pip install -r python/requirements.txt"
-    startCommand: "cd python && uvicorn weather_service:app --host 0.0.0.0 --port $PORT"
+    startCommand: "python python/weather_service.py"
     envVars:
       - key: PYTHON_VERSION
         value: 3.11.0
