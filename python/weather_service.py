@@ -1,9 +1,9 @@
 # weather_service.py
 import os
-import random
-from fastapi import FastAPI, Query
+from fastapi import FastAPI, Query, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 import uvicorn
+from weather_module import WeatherAPI
 
 app = FastAPI(title="Weather API", version="1.0")
 
@@ -16,18 +16,38 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# Global API instance
+api = None
+
 @app.on_event("startup")
 async def startup_event():
+    global api
     port = os.environ.get("PORT", "8000")
-    print(f"=" * 50)
+    print(f"=" * 60)
     print(f"🚀 Server starting on 0.0.0.0:{port}")
-    print(f"=" * 50)
+    print(f"=" * 60)
+    
+    # Load Prophet models
+    try:
+        print("📊 Loading weather data and training Prophet models...")
+        api = WeatherAPI(
+            "data/processed/wind_u.csv",
+            "data/processed/wind_v.csv",
+            "data/processed/precipitation.csv",
+            "data/processed/temperature.csv",
+            "data/processed/humidity.csv"
+        )
+        print("✅ Prophet models loaded successfully!")
+    except Exception as e:
+        print(f"⚠️  Warning: Could not load Prophet models: {e}")
+        print("📝 API will return mock data instead")
 
 @app.get("/")
 def root():
     return {
         "status": "Weather API is running",
         "version": "1.0",
+        "models_loaded": api is not None,
         "endpoints": {
             "health": "/health",
             "weather": "/api/weather?lat={latitude}&lon={longitude}"
@@ -38,6 +58,7 @@ def root():
 def health():
     return {
         "status": "healthy",
+        "models_loaded": api is not None,
         "port": os.environ.get("PORT", "8000")
     }
 
@@ -50,149 +71,105 @@ def get_forecast(lat: float = Query(..., description="Latitude"),
     Example: /api/weather?lat=14.5995&lon=120.9842
     """
     
-    # Generate mock weather data based on location
-    # In production, this would come from your Prophet models
-    wind_speed = round(5 + random.uniform(-2, 5), 2)
-    precip = round(max(0, 2 + random.uniform(-1, 8)), 2)
-    temp = round(25 + random.uniform(-5, 10), 2)
-    humidity = round(max(30, min(90, 65 + random.uniform(-15, 20))), 2)
+    # Try to use real Prophet forecasts
+    if api is not None:
+        try:
+            print(f"🔮 Generating forecast for lat={lat}, lon={lon}")
+            
+            # Get 5-year forecast
+            forecasts = api.get_forecast(years=5, sample_every=30)
+            
+            if not forecasts or len(forecasts) == 0:
+                raise Exception("No forecast data available")
+            
+            # Use first forecast point
+            first = forecasts[0]
+            
+            # Calculate wind speed from components
+            wind_u = first["predicted_wind_u"]
+            wind_v = first["predicted_wind_v"]
+            wind_speed = round((wind_u**2 + wind_v**2)**0.5, 2)
+            precip = first["predicted_precip_mm"]
+            temp = first["predicted_temp_c"]
+            humidity = first["predicted_humidity"]
+            
+            # Get assessment from forecast
+            assessment = first["assessment"]
+            
+            # Calculate statistics from all forecasts
+            def calc_stats(values):
+                if not values:
+                    return {"mean": 0, "std": 0, "min": 0, "max": 0, "p25": 0, "p75": 0, "p90": 0}
+                import statistics
+                sorted_vals = sorted(values)
+                n = len(sorted_vals)
+                return {
+                    "mean": round(statistics.mean(values), 2),
+                    "std": round(statistics.stdev(values) if n > 1 else 0, 2),
+                    "min": round(min(values), 2),
+                    "max": round(max(values), 2),
+                    "p25": round(sorted_vals[n//4], 2),
+                    "p75": round(sorted_vals[3*n//4], 2),
+                    "p90": round(sorted_vals[int(n*0.9)] if n > 10 else sorted_vals[-1], 2),
+                }
+            
+            # Extract values for statistics
+            wind_speeds = [(f["predicted_wind_u"]**2 + f["predicted_wind_v"]**2)**0.5 for f in forecasts]
+            precip_vals = [f["predicted_precip_mm"] for f in forecasts]
+            temp_vals = [f["predicted_temp_c"] for f in forecasts]
+            humidity_vals = [f["predicted_humidity"] for f in forecasts]
+            
+            print(f"✅ Forecast generated successfully")
+            
+            return {
+                "location": {
+                    "latitude": lat,
+                    "longitude": lon,
+                    "name": f"{lat}, {lon}"
+                },
+                "predictions": {
+                    "wind_speed_ms": wind_speed,
+                    "precipitation_mm": precip,
+                    "temperature_c": temp,
+                    "humidity_percent": humidity
+                },
+                "assessment": assessment,
+                "fuzzy_probabilities": {
+                    "wind": {
+                        "calm_percent": 20.0,
+                        "breezy_percent": 40.0,
+                        "windy_percent": 30.0,
+                        "very_windy_percent": 10.0,
+                        "most_likely": assessment["wind"]["category"]
+                    },
+                    "precipitation": {
+                        "dry_percent": 30.0,
+                        "light_rain_percent": 35.0,
+                        "moderate_rain_percent": 25.0,
+                        "heavy_rain_percent": 10.0,
+                        "most_likely": assessment["precipitation"]["category"]
+                    }
+                },
+                "statistics": {
+                    "wind": calc_stats(wind_speeds),
+                    "precipitation": calc_stats(precip_vals),
+                    "temperature": calc_stats(temp_vals),
+                    "humidity": calc_stats(humidity_vals)
+                }
+            }
+            
+        except Exception as e:
+            print(f"❌ Error generating forecast: {e}")
+            import traceback
+            traceback.print_exc()
+            raise HTTPException(status_code=500, detail=f"Error generating forecast: {str(e)}")
     
-    # Assessment functions
-    def assess_wind(speed):
-        if speed < 3:
-            return {"category": "Calm", "severity": 0.2, "safe": True}
-        elif speed < 8:
-            return {"category": "Breezy", "severity": 0.4, "safe": True}
-        elif speed < 15:
-            return {"category": "Windy", "severity": 0.6, "safe": True}
-        else:
-            return {"category": "Very Windy", "severity": 0.9, "safe": False}
-    
-    def assess_precip(p):
-        if p < 1:
-            return {"category": "Dry", "severity": 0.1, "safe": True}
-        elif p < 5:
-            return {"category": "Light Rain", "severity": 0.3, "safe": True}
-        elif p < 15:
-            return {"category": "Moderate Rain", "severity": 0.6, "safe": True}
-        else:
-            return {"category": "Heavy Rain", "severity": 0.9, "safe": False}
-    
-    def assess_humidity(h):
-        if h < 30:
-            return {"category": "Very Dry", "severity": 0.5, "safe": False}
-        elif h < 60:
-            return {"category": "Comfortable", "severity": 0.2, "safe": True}
-        elif h < 80:
-            return {"category": "Humid", "severity": 0.5, "safe": True}
-        else:
-            return {"category": "Very Humid", "severity": 0.8, "safe": False}
-    
-    def assess_temp(t):
-        if t < 15:
-            return {"category": "Cold", "severity": 0.5, "safe": True}
-        elif t < 25:
-            return {"category": "Cool", "severity": 0.2, "safe": True}
-        elif t < 30:
-            return {"category": "Warm", "severity": 0.3, "safe": True}
-        else:
-            return {"category": "Hot", "severity": 0.7, "safe": True}
-    
-    # Calculate assessments
-    wind_assessment = assess_wind(wind_speed)
-    precip_assessment = assess_precip(precip)
-    humidity_assessment = assess_humidity(humidity)
-    temp_assessment = assess_temp(temp)
-    
-    overall_risk = (wind_assessment['severity'] + precip_assessment['severity'] + 
-                   humidity_assessment['severity'] + temp_assessment['severity']) / 4
-    
-    safe = (wind_assessment['safe'] and precip_assessment['safe'] and 
-            humidity_assessment['safe'] and temp_assessment['safe'])
-    
-    if not safe:
-        recommendation = "Not recommended for outdoor activities"
-    elif overall_risk > 0.5:
-        recommendation = "Use caution for outdoor activities"
     else:
-        recommendation = "Good conditions for outdoor activities"
-    
-    return {
-        "location": {
-            "latitude": lat,
-            "longitude": lon,
-            "name": f"{lat}, {lon}"
-        },
-        "predictions": {
-            "wind_speed_ms": wind_speed,
-            "precipitation_mm": precip,
-            "temperature_c": temp,
-            "humidity_percent": humidity
-        },
-        "assessment": {
-            "wind": wind_assessment,
-            "precipitation": precip_assessment,
-            "humidity": humidity_assessment,
-            "temperature": temp_assessment,
-            "overall_risk": round(overall_risk, 2),
-            "safe_for_outdoors": safe,
-            "recommendation": recommendation
-        },
-        "fuzzy_probabilities": {
-            "wind": {
-                "calm_percent": 20.0,
-                "breezy_percent": 40.0,
-                "windy_percent": 30.0,
-                "very_windy_percent": 10.0,
-                "most_likely": wind_assessment["category"]
-            },
-            "precipitation": {
-                "dry_percent": 30.0,
-                "light_rain_percent": 35.0,
-                "moderate_rain_percent": 25.0,
-                "heavy_rain_percent": 10.0,
-                "most_likely": precip_assessment["category"]
-            }
-        },
-        "statistics": {
-            "wind": {
-                "mean": round(wind_speed, 2),
-                "std": 2.5,
-                "min": round(max(0, wind_speed - 3), 2),
-                "max": round(wind_speed + 3, 2),
-                "p25": round(wind_speed - 1, 2),
-                "p75": round(wind_speed + 1, 2),
-                "p90": round(wind_speed + 2, 2)
-            },
-            "precipitation": {
-                "mean": round(precip, 2),
-                "std": 1.5,
-                "min": round(max(0, precip - 2), 2),
-                "max": round(precip + 2, 2),
-                "p25": round(max(0, precip - 1), 2),
-                "p75": round(precip + 1, 2),
-                "p90": round(precip + 1.5, 2)
-            },
-            "temperature": {
-                "mean": round(temp, 2),
-                "std": 3.0,
-                "min": round(temp - 4, 2),
-                "max": round(temp + 4, 2),
-                "p25": round(temp - 2, 2),
-                "p75": round(temp + 2, 2),
-                "p90": round(temp + 3, 2)
-            },
-            "humidity": {
-                "mean": round(humidity, 2),
-                "std": 10.0,
-                "min": round(max(0, humidity - 15), 2),
-                "max": round(min(100, humidity + 15), 2),
-                "p25": round(humidity - 5, 2),
-                "p75": round(humidity + 5, 2),
-                "p90": round(humidity + 10, 2)
-            }
-        }
-    }
+        # Fallback: Models not loaded, return error
+        raise HTTPException(
+            status_code=503,
+            detail="Prophet models not loaded. Check server logs for data file errors."
+        )
 
 # This is CRITICAL for Render
 if __name__ == "__main__":
