@@ -124,143 +124,58 @@ class ProphetForecaster:
 
 weather_models = None
 
-@app.on_event("startup")
-async def load_models():
-    global weather_models
-    try:
-        print("📊 Loading weather data...")
+class WeatherAPI:
+    def __init__(self, wind_u_path, wind_v_path, precip_path, temp_path, humidity_path):
+        """Initialize Weather API with Prophet models"""
+        self.models = {}
         
-        # Try to load CSV files
-        wind_u = pd.read_csv("data/processed/wind_u.csv")
-        wind_v = pd.read_csv("data/processed/wind_v.csv")
-        precip = pd.read_csv("data/processed/precipitation.csv")
-        temp = pd.read_csv("data/processed/temperature.csv")
-        humidity = pd.read_csv("data/processed/humidity.csv")
+        # Load and train models
+        wind_u = pd.read_csv(wind_u_path)
+        wind_v = pd.read_csv(wind_v_path)
+        precip = pd.read_csv(precip_path)
+        temp = pd.read_csv(temp_path)
+        humidity = pd.read_csv(humidity_path)
         
-        print("🤖 Training Prophet models...")
-        weather_models = {
-            'wind_u': ProphetForecaster(wind_u),
-            'wind_v': ProphetForecaster(wind_v),
-            'precip': ProphetForecaster(precip),
-            'temp': ProphetForecaster(temp),
-            'humidity': ProphetForecaster(humidity)
-        }
-        print("✅ Models loaded successfully!")
-    except Exception as e:
-        print(f"⚠️ Could not load models: {e}")
-        print("Using fallback mode without Prophet")
-        weather_models = None
-
-@app.get("/")
-def root():
-    return {
-        "status": "Weather API is running",
-        "version": "1.0",
-        "models_loaded": weather_models is not None
-    }
-
-@app.get("/health")
-def health():
-    return {
-        "status": "healthy",
-        "models_loaded": weather_models is not None
-    }
-
-@app.get("/api/weather")
-def get_forecast(lat: float = Query(...), lon: float = Query(...)):
-    """Get weather forecast with Prophet predictions"""
+        self.models['wind_u'] = ProphetForecaster(wind_u)
+        self.models['wind_v'] = ProphetForecaster(wind_v)
+        self.models['precip'] = ProphetForecaster(precip)
+        self.models['temp'] = ProphetForecaster(temp)
+        self.models['humidity'] = ProphetForecaster(humidity)
     
-    if weather_models is None:
-        raise HTTPException(status_code=503, detail="Weather models not loaded")
-    
-    try:
-        # Generate forecast for next 365 days
-        wind_u_forecast = weather_models['wind_u'].forecast(365)
-        wind_v_forecast = weather_models['wind_v'].forecast(365)
-        precip_forecast = weather_models['precip'].forecast(365)
-        temp_forecast = weather_models['temp'].forecast(365)
-        humidity_forecast = weather_models['humidity'].forecast(365)
+    def get_forecast(self, years=5, sample_every=30):
+        """Generate weather forecast for specified years"""
+        days = years * 365
         
-        # Get first prediction (tomorrow)
-        wind_u = wind_u_forecast.iloc[-1]['yhat']
-        wind_v = wind_v_forecast.iloc[-1]['yhat']
-        wind_speed = (wind_u**2 + wind_v**2)**0.5
-        precip = max(0, precip_forecast.iloc[-1]['yhat'])
-        temp = temp_forecast.iloc[-1]['yhat']
-        humidity = max(0, min(100, humidity_forecast.iloc[-1]['yhat']))
+        # Get forecasts from all models
+        wind_u_forecast = self.models['wind_u'].forecast(days)
+        wind_v_forecast = self.models['wind_v'].forecast(days)
+        precip_forecast = self.models['precip'].forecast(days)
+        temp_forecast = self.models['temp'].forecast(days)
+        humidity_forecast = self.models['humidity'].forecast(days)
         
-        # Get assessment
-        assessment = SimpleFuzzyLogic.overall_assessment(
-            wind_speed, precip, humidity, temp
-        )
+        # Sample every N days
+        forecasts = []
+        for i in range(0, len(wind_u_forecast), sample_every):
+            wind_u = wind_u_forecast.iloc[i]['yhat']
+            wind_v = wind_v_forecast.iloc[i]['yhat']
+            wind_speed = (wind_u**2 + wind_v**2)**0.5
+            precip = max(0, precip_forecast.iloc[i]['yhat'])
+            temp = temp_forecast.iloc[i]['yhat']
+            humidity = max(0, min(100, humidity_forecast.iloc[i]['yhat']))
+            
+            # Get fuzzy logic assessment
+            assessment = SimpleFuzzyLogic.overall_assessment(
+                wind_speed, precip, humidity, temp
+            )
+            
+            forecasts.append({
+                "date": str(wind_u_forecast.iloc[i]['ds']),
+                "predicted_wind_u": round(wind_u, 2),
+                "predicted_wind_v": round(wind_v, 2),
+                "predicted_precip_mm": round(precip, 2),
+                "predicted_temp_c": round(temp, 2),
+                "predicted_humidity": round(humidity, 2),
+                "assessment": assessment
+            })
         
-        return {
-            "location": {
-                "latitude": lat,
-                "longitude": lon,
-                "name": f"{lat}, {lon}"
-            },
-            "predictions": {
-                "wind_speed_ms": round(wind_speed, 2),
-                "precipitation_mm": round(precip, 2),
-                "temperature_c": round(temp, 2),
-                "humidity_percent": round(humidity, 2)
-            },
-            "assessment": assessment,
-            "fuzzy_probabilities": {
-                "wind": {
-                    "calm_percent": 20,
-                    "breezy_percent": 40,
-                    "windy_percent": 30,
-                    "very_windy_percent": 10,
-                    "most_likely": assessment["wind"]["category"]
-                },
-                "precipitation": {
-                    "dry_percent": 30,
-                    "light_rain_percent": 35,
-                    "moderate_rain_percent": 25,
-                    "heavy_rain_percent": 10,
-                    "most_likely": assessment["precipitation"]["category"]
-                }
-            },
-            "statistics": {
-                "wind": {
-                    "mean": round(wind_speed, 2),
-                    "std": 2.5,
-                    "min": max(0, wind_speed - 3),
-                    "max": wind_speed + 3,
-                    "p25": wind_speed - 1,
-                    "p75": wind_speed + 1,
-                    "p90": wind_speed + 2
-                },
-                "precipitation": {
-                    "mean": round(precip, 2),
-                    "std": 1.5,
-                    "min": max(0, precip - 2),
-                    "max": precip + 2,
-                    "p25": max(0, precip - 1),
-                    "p75": precip + 1,
-                    "p90": precip + 1.5
-                },
-                "temperature": {
-                    "mean": round(temp, 2),
-                    "std": 3.0,
-                    "min": temp - 4,
-                    "max": temp + 4,
-                    "p25": temp - 2,
-                    "p75": temp + 2,
-                    "p90": temp + 3
-                },
-                "humidity": {
-                    "mean": round(humidity, 2),
-                    "std": 10.0,
-                    "min": max(0, humidity - 15),
-                    "max": min(100, humidity + 15),
-                    "p25": humidity - 5,
-                    "p75": humidity + 5,
-                    "p90": humidity + 10
-                }
-            }
-        }
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Forecast error: {str(e)}")
+        return forecasts
