@@ -50,12 +50,6 @@ def get_forecast(lat: float = Query(..., description="Latitude"),
     Example: /api/weather?lat=14.5995&lon=120.9842
     """
     
-    # Generate mock forecast data
-    wind_speed = round(random.uniform(2, 12), 2)
-    precip = round(random.uniform(0, 10), 2)
-    temp = round(random.uniform(20, 35), 2)
-    humidity = round(random.uniform(40, 90), 2)
-    
     # Assessment functions
     def assess_wind(speed):
         if speed < 3:

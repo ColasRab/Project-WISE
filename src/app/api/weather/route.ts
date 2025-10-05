@@ -11,10 +11,9 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: "Missing latitude or longitude" }, { status: 400 })
     }
 
-    const apiRes = await fetch(
-      `https://project-wise.onrender.com/api/weather?lat=${lat}&lon=${lon}`,
-      { cache: "no-store" }
-    )
+    const apiRes = await fetch(`https://project-wise.onrender.com/api/weather?lat=${lat}&lon=${lon}`, {
+      cache: "no-store",
+    })
 
     if (!apiRes.ok) {
       throw new Error(`Backend API returned ${apiRes.status}`)

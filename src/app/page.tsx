@@ -3,14 +3,16 @@
 import { useState } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Calendar } from "@/components/ui/calendar"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
-import { CalendarIcon, Download, MapPin, Loader2 } from "lucide-react"
+import { CalendarIcon, Download, Loader2, Sparkles } from "lucide-react"
 import { format } from "date-fns"
 import WeatherRiskCards from "@/components/weather-risk-cards"
 import WeatherChart from "@/components/weather-chart"
+import { LocationAutocomplete, PhilippineLocation } from "@/components/location-autocomplete"
+import { AnimatedWeatherIcon } from "@/components/animated-weather-icon"
+import { motion, AnimatePresence } from "framer-motion"
 
 interface LocationForecast {
   location: {
@@ -21,6 +23,8 @@ interface LocationForecast {
   predictions: {
     wind_speed_ms: number
     precipitation_mm: number
+    temperature_c: number
+    humidity_percent: number
   }
   fuzzy_probabilities: {
     wind: {
@@ -49,6 +53,16 @@ interface LocationForecast {
       severity: number
       safe: boolean
     }
+    temperature: {
+      category: string
+      severity: number
+      safe: boolean
+    }
+    humidity: {
+      category: string
+      severity: number
+      safe: boolean
+    }
     overall_risk: number
     safe_for_outdoors: boolean
     recommendation: string
@@ -72,67 +86,57 @@ interface LocationForecast {
       p75: number
       p90: number
     }
+    temperature: {
+      mean: number
+      std: number
+      min: number
+      max: number
+      p25: number
+      p75: number
+      p90: number
+    }
+    humidity: {
+      mean: number
+      std: number
+      min: number
+      max: number
+      p25: number
+      p75: number
+      p90: number
+    }
   }
 }
 
 export default function WeatherDashboard() {
-  const [location, setLocation] = useState("")
+  const [selectedLocation, setSelectedLocation] = useState<PhilippineLocation | null>(null)
   const [date, setDate] = useState<Date>()
   const [loading, setLoading] = useState(false)
   const [weatherData, setWeatherData] = useState<LocationForecast | null>(null)
 
-  const geocodeLocation = async (locationName: string) => {
-    try {
-      const response = await fetch(
-        `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(locationName)}&format=json&limit=1`,
-      )
-      const data = await response.json()
-
-      if (data && data.length > 0) {
-        return {
-          lat: Number.parseFloat(data[0].lat),
-          lon: Number.parseFloat(data[0].lon),
-          name: data[0].display_name,
-        }
-      }
-      throw new Error("Location not found")
-    } catch (error) {
-      console.error("Geocoding error:", error)
-      throw error
-    }
-  }
-
   const handleSearch = async () => {
-    if (!location || !date) return
+    if (!selectedLocation || !date) return
 
     setLoading(true)
     try {
-      // First, convert location name to coordinates
-      const coords = await geocodeLocation(location)
-      console.log('Geocoded location:', coords)
+      const response = await fetch(`/api/weather?lat=${selectedLocation.lat}&lon=${selectedLocation.lon}`)
 
-      // Then fetch weather data using coordinates
-      const response = await fetch(`/api/weather?lat=${coords.lat}&lon=${coords.lon}`)
-      
       if (!response.ok) {
         const errorData = await response.json()
         throw new Error(errorData.error || "Failed to fetch weather data")
       }
 
       const data = await response.json()
-      console.log('Received weather data:', data)
 
       if (data.error) {
         throw new Error(data.error)
       }
 
-      // Add location name to the data, ensuring it's always a string
       const enrichedData = {
         ...data,
         location: {
           ...data.location,
-          name: coords.name ?? ""
-        }
+          name: `${selectedLocation.name}, ${selectedLocation.province}`,
+        },
       }
 
       setWeatherData(enrichedData)
@@ -145,121 +149,172 @@ export default function WeatherDashboard() {
   }
 
   const handleExport = () => {
-    if (!weatherData) return
+    if (!weatherData || !selectedLocation) return
 
     const dataStr = JSON.stringify(weatherData, null, 2)
     const dataBlob = new Blob([dataStr], { type: "application/json" })
     const url = URL.createObjectURL(dataBlob)
     const link = document.createElement("a")
     link.href = url
-    link.download = `weather-insights-${location}-${format(date!, "yyyy-MM-dd")}.json`
+    link.download = `weather-insights-${selectedLocation.name}-${format(date!, "yyyy-MM-dd")}.json`
     link.click()
     URL.revokeObjectURL(url)
   }
 
   return (
-    <main className="min-h-screen bg-background p-6 md:p-12">
+    <main className="min-h-screen bg-gradient-to-br from-background via-background to-accent/5 p-6 md:p-12">
       <div className="max-w-7xl mx-auto space-y-8">
-        {/* Header */}
-        <div className="space-y-2">
-          <h1 className="text-4xl font-bold tracking-tight text-balance">Weather Risk Dashboard</h1>
+        <motion.div
+          className="space-y-2"
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+        >
+          <div className="flex items-center gap-3">
+            <AnimatedWeatherIcon type="cloud" className="h-10 w-10 text-primary" />
+            <h1 className="text-4xl font-bold tracking-tight text-balance bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent">
+              Weather Risk Dashboard
+            </h1>
+            <Sparkles className="h-6 w-6 text-amber-500 animate-pulse" />
+          </div>
           <p className="text-muted-foreground text-lg">
-            Plan your outdoor activities with confidence using NASA Earth observation data
+            Plan your outdoor activities in the Philippines with confidence using NASA Earth observation data
           </p>
-        </div>
+        </motion.div>
 
-        {/* Search Controls */}
-        <Card className="border-border/50">
-          <CardHeader>
-            <CardTitle>Search Weather Conditions</CardTitle>
-            <CardDescription>Enter a location and date to view weather risk insights</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="flex flex-col md:flex-row gap-4">
-              <div className="flex-1 space-y-2">
-                <Label htmlFor="location">Location</Label>
-                <div className="relative">
-                  <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                  <Input
-                    id="location"
-                    placeholder="Manila"
-                    value={location}
-                    onChange={(e) => setLocation(e.target.value)}
-                    className="pl-10"
-                  />
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.1 }}
+        >
+          <Card className="border-border/50 shadow-lg hover:shadow-xl transition-shadow duration-300">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <AnimatedWeatherIcon type="sun" className="h-5 w-5 text-amber-500" />
+                Search Weather Conditions
+              </CardTitle>
+              <CardDescription>
+                Select a location in the Philippines and date to view weather risk insights
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="flex flex-col md:flex-row gap-4">
+                <div className="flex-1 space-y-2">
+                  <Label htmlFor="location">Location (Philippines)</Label>
+                  <LocationAutocomplete value={selectedLocation} onChange={setSelectedLocation} />
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Date</Label>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant="outline"
+                        className="w-full md:w-[240px] justify-start text-left font-normal bg-transparent hover:bg-accent/50 transition-colors"
+                      >
+                        <CalendarIcon className="mr-2 h-4 w-4" />
+                        {date ? format(date, "PPP") : "Pick a date"}
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0" align="start">
+                      <Calendar mode="single" selected={date} onSelect={setDate} initialFocus />
+                    </PopoverContent>
+                  </Popover>
+                </div>
+
+                <div className="flex items-end">
+                  <Button
+                    onClick={handleSearch}
+                    disabled={!selectedLocation || !date || loading}
+                    className="w-full md:w-auto bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 transition-all duration-300 shadow-md hover:shadow-lg"
+                  >
+                    {loading ? (
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        Analyzing...
+                      </>
+                    ) : (
+                      <>
+                        <Sparkles className="mr-2 h-4 w-4" />
+                        Get Insights
+                      </>
+                    )}
+                  </Button>
                 </div>
               </div>
-
-              <div className="space-y-2">
-                <Label>Date</Label>
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <Button
-                      variant="outline"
-                      className="w-full md:w-[240px] justify-start text-left font-normal bg-transparent"
-                    >
-                      <CalendarIcon className="mr-2 h-4 w-4" />
-                      {date ? format(date, "PPP") : "Pick a date"}
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0" align="start">
-                    <Calendar mode="single" selected={date} onSelect={setDate} initialFocus />
-                  </PopoverContent>
-                </Popover>
-              </div>
-
-              <div className="flex items-end">
-                <Button onClick={handleSearch} disabled={!location || !date || loading} className="w-full md:w-auto">
-                  {loading ? (
-                    <>
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      Analyzing...
-                    </>
-                  ) : (
-                    "Get Insights"
-                  )}
-                </Button>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Results */}
-        {weatherData && (
-          <>
-            <div className="flex items-center justify-between">
-              <div>
-                <h2 className="text-2xl font-semibold">Weather Insights</h2>
-                <p className="text-muted-foreground">
-                  {weatherData.location.name || `${weatherData.location.latitude}, ${weatherData.location.longitude}`} • {date ? format(date, "MMMM d, yyyy") : ''}
-                </p>
-              </div>
-              <Button onClick={handleExport} variant="outline">
-                <Download className="mr-2 h-4 w-4" />
-                Export Data
-              </Button>
-            </div>
-
-            <div className="space-y-6">
-              <WeatherRiskCards data={weatherData} />
-              <WeatherChart data={weatherData} />
-            </div>
-          </>
-        )}
-
-        {!weatherData && !loading && (
-          <Card className="border-dashed">
-            <CardContent className="flex flex-col items-center justify-center py-16 text-center">
-              <div className="rounded-full bg-muted p-4 mb-4">
-                <MapPin className="h-8 w-8 text-muted-foreground" />
-              </div>
-              <h3 className="text-lg font-semibold mb-2">No data yet</h3>
-              <p className="text-muted-foreground max-w-sm">
-                Enter a location and date above to view weather risk insights and plan your outdoor activities
-              </p>
             </CardContent>
           </Card>
-        )}
+        </motion.div>
+
+        <AnimatePresence mode="wait">
+          {weatherData && (
+            <motion.div
+              key="results"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 0.5 }}
+              className="space-y-6"
+            >
+              <div className="flex items-center justify-between">
+                <div>
+                  <h2 className="text-2xl font-semibold flex items-center gap-2">
+                    <AnimatedWeatherIcon type="cloud" className="h-6 w-6 text-primary" />
+                    Weather Insights
+                  </h2>
+                  <p className="text-muted-foreground">
+                    {weatherData.location.name} • {date ? format(date, "MMMM d, yyyy") : ""}
+                  </p>
+                </div>
+                <Button
+                  onClick={handleExport}
+                  variant="outline"
+                  className="hover:bg-accent/50 transition-colors bg-transparent"
+                >
+                  <Download className="mr-2 h-4 w-4" />
+                  Export Data
+                </Button>
+              </div>
+
+              <WeatherRiskCards data={weatherData} />
+              <WeatherChart data={weatherData} />
+            </motion.div>
+          )}
+
+          {!weatherData && !loading && (
+            <motion.div
+              key="empty"
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              transition={{ duration: 0.3 }}
+            >
+              <Card className="border-dashed hover:border-solid transition-all duration-300">
+                <CardContent className="flex flex-col items-center justify-center py-16 text-center">
+                  <motion.div
+                    className="rounded-full bg-gradient-to-br from-primary/20 to-accent/20 p-6 mb-4"
+                    animate={{
+                      scale: [1, 1.05, 1],
+                      rotate: [0, 5, -5, 0],
+                    }}
+                    transition={{
+                      duration: 4,
+                      repeat: Number.POSITIVE_INFINITY,
+                      ease: "easeInOut",
+                    }}
+                  >
+                    <AnimatedWeatherIcon type="cloud" className="h-12 w-12 text-primary" />
+                  </motion.div>
+                  <h3 className="text-lg font-semibold mb-2">No data yet</h3>
+                  <p className="text-muted-foreground max-w-sm">
+                    Select a location in the Philippines and date above to view weather risk insights and plan your
+                    outdoor activities
+                  </p>
+                </CardContent>
+              </Card>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
     </main>
   )
