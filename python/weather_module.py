@@ -94,7 +94,9 @@ class ProphetForecaster:
         self.model.fit(self.df)
 
     def forecast(self, years=5, freq="D"):
-        future = self.model.make_future_dataframe(periods=years*365, freq=freq)
+        periods = int(years) * 365
+        future = self.model.make_future_dataframe(periods=periods, freq=freq)
+
         forecast = self.model.predict(future)
         return forecast[["ds", "yhat", "yhat_lower", "yhat_upper"]]
 
@@ -120,7 +122,7 @@ class WeatherAPI:
         self.humidity_forecaster = ProphetForecaster(self.humidity, value_col="value", day_col="day", hour_col="hour")
 
 
-    def forecast_trend(self, years=5, sample_every=30):
+    def get_forecast(self, years=5, sample_every=30):
         wind_u_future = self.wind_u_forecaster.forecast(years)
         wind_v_future = self.wind_v_forecaster.forecast(years)
         precip_future = self.precip_forecaster.forecast(years)
