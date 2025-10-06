@@ -1,80 +1,59 @@
 import { NextRequest, NextResponse } from "next/server"
 
-export async function GET(request: NextRequest) {
-  const searchParams = request.nextUrl.searchParams
-  const lat = searchParams.get("lat")
-  const lon = searchParams.get("lon")
-  const targetDate = searchParams.get("target_date")
-  const targetHour = searchParams.get("target_hour") || "all"
-
-  console.log("Received params:", { lat, lon, targetDate, targetHour })
-
-  if (!lat || !lon || !targetDate) {
-    return NextResponse.json(
-      { error: "Missing required parameters: lat, lon, and target_date are required" },
-      { status: 400 }
-    )
-  }
-
+export async function POST(request: NextRequest) {
   try {
+    const body = await request.json()
+    const { lat, lon, date, time } = body
+
+    console.log("Received body params:", { lat, lon, date, time })
+
+    if (!lat || !lon || !date) {
+      return NextResponse.json(
+        { error: "Missing required parameters: lat, lon, and date are required" },
+        { status: 400 }
+      )
+    }
+
     // Get the backend URL from environment variable or use default
     const backendUrl = process.env.BACKEND_URL || "https://project-wise.onrender.com"
-    
+
     // Construct the URL with proper parameters
     const url = new URL("/api/weather", backendUrl)
-    url.searchParams.set("lat", lat)
-    url.searchParams.set("lon", lon)
-    url.searchParams.set("target_date", targetDate)
-    url.searchParams.set("target_hour", targetHour)
+    url.searchParams.set("lat", lat.toString())
+    url.searchParams.set("lon", lon.toString())
+    url.searchParams.set("target_date", date)
+    url.searchParams.set("target_hour", time || "all")
 
-    console.log("Fetching weather data from:", url.toString())
-    console.log("Parameters being sent:", {
-      lat,
-      lon,
-      target_date: targetDate,
-      target_hour: targetHour
-    })
+    console.log("Fetching weather data from backend:", url.toString())
 
     const response = await fetch(url.toString(), {
       method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      // Add timeout to prevent hanging
-      signal: AbortSignal.timeout(30000), // 30 second timeout
+      headers: { "Content-Type": "application/json" },
+      signal: AbortSignal.timeout(30000), // 30 sec timeout
     })
 
     if (!response.ok) {
-      const errorData = await response.json().catch(() => ({ error: "Unknown error" }))
-      console.error("Backend error:", errorData)
+      const errorData = await response.json().catch(() => ({}))
       return NextResponse.json(
-        { error: errorData.message || `Backend returned ${response.status}` },
+        { error: errorData.error || `Backend returned ${response.status}` },
         { status: response.status }
       )
     }
 
     const data = await response.json()
-
-    // Return the data from the backend
     return NextResponse.json(data)
   } catch (error) {
     console.error("Error fetching weather data:", error)
-    
-    if (error instanceof Error) {
-      if (error.name === "AbortError") {
-        return NextResponse.json(
-          { error: "Request timeout - backend took too long to respond" },
-          { status: 504 }
-        )
-      }
+
+    if (error instanceof Error && error.name === "AbortError") {
       return NextResponse.json(
-        { error: `Failed to fetch weather data: ${error.message}` },
-        { status: 500 }
+        { error: "Request timeout - backend took too long to respond" },
+        { status: 504 }
       )
     }
 
     return NextResponse.json(
-      { error: "Failed to fetch weather data from backend" },
+      { error: error instanceof Error ? error.message : "Failed to fetch weather data" },
       { status: 500 }
     )
   }
