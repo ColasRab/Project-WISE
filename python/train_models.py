@@ -16,8 +16,7 @@ def train_and_save(csv_file, value_col="value", day_col="day", hour_col="hour", 
     """Train a Prophet model from CSV and save to models/"""
     path = os.path.join(DATA_DIR, csv_file)
     if not os.path.exists(path):
-        print(f"⚠️ Skipping {csv_file} (file not found at {path})")
-        return
+        raise FileNotFoundError(f"❌ Training data missing: {path}")
 
     df = pd.read_csv(path)
 

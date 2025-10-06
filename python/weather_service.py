@@ -32,6 +32,25 @@ api = None
 model_load_error = None
 models_ready = False
 
+
+def train_and_load_models():
+    global api, model_load_error, models_ready
+    try:
+        script_dir = os.path.dirname(os.path.abspath(__file__))
+        model_dir = os.path.join(script_dir, "models")
+        os.makedirs(model_dir, exist_ok=True)
+
+        from weather_module import WeatherAPI
+        api = WeatherAPI(model_dir=model_dir)
+        models_ready = True
+        print("✅ Pretrained models loaded successfully!")
+
+    except Exception as e:
+        model_load_error = str(e)
+        print(f"❌ Failed to load models: {e}")
+        traceback.print_exc()
+
+
 @app.on_event("startup")
 async def startup_event():
     port = os.environ.get("PORT", "8000")
