@@ -77,38 +77,48 @@ def health():
 
 
 @app.get("/api/weather")
-def get_forecast(lat: float = Query(..., description="Latitude"),
-                 lon: float = Query(..., description="Longitude"),
-                 hours: int = Query(168, description="Forecast horizon in hours (default: 168 = 7 days)")):
+def get_forecast(
+    lat: float = Query(..., description="Latitude"),
+    lon: float = Query(..., description="Longitude"),
+    hours: int = Query(168, description="Forecast horizon in hours (default: 168 = 7 days)")
+):
     """Get weather forecast for a specific location (hourly resolution)."""
 
     if api is None:
         return {
             "status": "loading",
             "message": "Models are still warming up or failed to load.",
-            "location": {"latitude": lat, "longitude": lon}
+            "location": {"latitude": lat, "longitude": lon},
+            "forecast": []
         }
 
     try:
         print(f"🔮 Generating forecast for lat={lat}, lon={lon}, hours={hours}")
-        forecasts = api.get_forecast(hours=hours, sample_every=3)  # every 3 hours for lighter response
+        forecasts = api.get_forecast(hours=hours, sample_every=3)  # every 3 hours
 
         if not forecasts:
-            raise Exception("No forecast data available")
+            return {
+                "status": "no_data",
+                "message": "No forecast data available",
+                "location": {"latitude": lat, "longitude": lon},
+                "forecast": []
+            }
 
-        # Return summary + full forecast
         return {
+            "status": "success",
             "location": {"latitude": lat, "longitude": lon, "name": f"{lat}, {lon}"},
-            "forecast": forecasts,
-            "status": "success"
+            "forecast": forecasts
         }
 
     except Exception as e:
-        print(f"❌ Error generating forecast: {e}")
         import traceback
         traceback.print_exc()
-        raise HTTPException(status_code=500, detail=f"Error generating forecast: {str(e)}")
-
+        return {
+            "status": "error",
+            "message": f"Error generating forecast: {str(e)}",
+            "location": {"latitude": lat, "longitude": lon},
+            "forecast": []
+        }
 
 print("=" * 60)
 print("✅ APP CREATED SUCCESSFULLY")
