@@ -1,111 +1,73 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from "next/server"
 
-export async function GET(request: Request) {
+export async function GET(request: NextRequest) {
+  const searchParams = request.nextUrl.searchParams
+  const lat = searchParams.get("lat")
+  const lon = searchParams.get("lon")
+  const targetDate = searchParams.get("target_date")
+  const targetHour = searchParams.get("target_hour") || "all"
+
+  if (!lat || !lon || !targetDate) {
+    return NextResponse.json(
+      { error: "Missing required parameters: lat, lon, and target_date are required" },
+      { status: 400 }
+    )
+  }
+
   try {
-    // Get query parameters from the URL
-    const { searchParams } = new URL(request.url);
-    const lat = searchParams.get('lat');
-    const lon = searchParams.get('lon');
-
-    // Validate parameters
-    if (!lat || !lon) {
-      return NextResponse.json(
-        { error: 'Missing required parameters: lat and lon' },
-        { status: 400 }
-      );
-    }
-
-    // Validate lat/lon are numbers
-    const latitude = parseFloat(lat);
-    const longitude = parseFloat(lon);
-
-    if (isNaN(latitude) || isNaN(longitude)) {
-      return NextResponse.json(
-        { error: 'Invalid coordinates: lat and lon must be numbers' },
-        { status: 400 }
-      );
-    }
-
-    // Validate coordinate ranges
-    if (latitude < -90 || latitude > 90) {
-      return NextResponse.json(
-        { error: 'Invalid latitude: must be between -90 and 90' },
-        { status: 400 }
-      );
-    }
-
-    if (longitude < -180 || longitude > 180) {
-      return NextResponse.json(
-        { error: 'Invalid longitude: must be between -180 and 180' },
-        { status: 400 }
-      );
-    }
-
-    // Get the backend API URL from environment variable
-    const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || 'https://project-wise.onrender.com';
+    // Get the backend URL from environment variable or use default
+    const backendUrl = process.env.BACKEND_URL || "https://project-wise.onrender.com"
     
-    console.log(`Fetching weather data from: ${BACKEND_URL}/api/weather?lat=${latitude}&lon=${longitude}`);
+    // Construct the URL with proper parameters
+    const url = new URL("/api/weather", backendUrl)
+    url.searchParams.set("lat", lat)
+    url.searchParams.set("lon", lon)
+    url.searchParams.set("target_date", targetDate)
+    url.searchParams.set("target_hour", targetHour)
 
-    // Call the Python backend API
-    const response = await fetch(
-      `${BACKEND_URL}/api/weather?lat=${latitude}&lon=${longitude}`,
-      {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        // Add timeout
-        signal: AbortSignal.timeout(30000), // 30 second timeout
-      }
-    );
+    console.log(`Fetching weather from: ${url.toString()}`)
+
+    const response = await fetch(url.toString(), {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      // Add timeout to prevent hanging
+      signal: AbortSignal.timeout(30000), // 30 second timeout
+    })
 
     if (!response.ok) {
-      const errorText = await response.text();
-      console.error('Backend API error:', errorText);
+      const errorData = await response.json().catch(() => ({ error: "Unknown error" }))
+      console.error("Backend error:", errorData)
       return NextResponse.json(
-        { 
-          error: 'Failed to fetch weather data from backend',
-          details: errorText,
-          status: response.status
-        },
+        { error: errorData.message || `Backend returned ${response.status}` },
         { status: response.status }
-      );
+      )
     }
 
-    const data = await response.json();
-    
+    const data = await response.json()
+
     // Return the data from the backend
-    return NextResponse.json(data);
-
+    return NextResponse.json(data)
   } catch (error) {
-    console.error('Error in weather API route:', error);
+    console.error("Error fetching weather data:", error)
     
-    // Handle different error types
-    if (typeof error === 'object' && error !== null && 'name' in error && (error as any).name === 'AbortError') {
+    if (error instanceof Error) {
+      if (error.name === "AbortError") {
+        return NextResponse.json(
+          { error: "Request timeout - backend took too long to respond" },
+          { status: 504 }
+        )
+      }
       return NextResponse.json(
-        { error: 'Request timeout: Backend server took too long to respond' },
-        { status: 504 }
-      );
-    }
-
-    if (
-      typeof error === 'object' &&
-      error !== null &&
-      'cause' in error &&
-      (error as any).cause?.code === 'ECONNREFUSED'
-    ) {
-      return NextResponse.json(
-        { error: 'Backend server is not reachable. Please check if the Python service is running.' },
-        { status: 503 }
-      );
+        { error: `Failed to fetch weather data: ${error.message}` },
+        { status: 500 }
+      )
     }
 
     return NextResponse.json(
-      { 
-        error: 'Internal server error',
-        message: typeof error === 'object' && error !== null && 'message' in error ? (error as any).message : String(error)
-      },
+      { error: "Failed to fetch weather data from backend" },
       { status: 500 }
-    );
+    )
   }
 }
