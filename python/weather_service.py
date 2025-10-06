@@ -30,6 +30,46 @@ app.add_middleware(
 api = None
 model_load_error = None
 
+def train_models_if_needed(model_dir: str) -> bool:
+    """Train models if they don't exist or are corrupted"""
+    import subprocess
+    
+    required_models = [
+        'wind_u_model.pkl',
+        'wind_v_model.pkl', 
+        'precipitation_model.pkl',
+        'temperature_model.pkl',
+        'humidity_model.pkl'
+    ]
+    
+    # Check if all models exist and are valid
+    all_exist = all(os.path.exists(os.path.join(model_dir, m)) for m in required_models)
+    
+    if not all_exist:
+        print("📚 Models not found. Training now...")
+        script_dir = os.path.dirname(os.path.abspath(__file__))
+        train_script = os.path.join(script_dir, "train_models.py")
+        
+        if not os.path.exists(train_script):
+            print(f"❌ Training script not found: {train_script}")
+            return False
+        
+        # Run training script
+        result = subprocess.run(
+            [sys.executable, train_script],
+            capture_output=True,
+            text=True
+        )
+        
+        if result.returncode != 0:
+            print(f"❌ Training failed:\n{result.stderr}")
+            return False
+        
+        print(f"✅ Training output:\n{result.stdout}")
+        return True
+    
+    return True
+
 
 @app.on_event("startup")
 async def startup_event():
@@ -43,15 +83,18 @@ async def startup_event():
     try:
         script_dir = os.path.dirname(os.path.abspath(__file__))
         model_dir = os.path.join(script_dir, "models")
-
-        print(f"📁 Looking for models in: {model_dir}")
-        if os.path.exists(model_dir):
-            print(f"📂 Found models: {os.listdir(model_dir)}")
-        else:
-            print("⚠️ No models folder found!")
-            model_load_error = "Models directory not found"
+        
+        # Create models directory if it doesn't exist
+        os.makedirs(model_dir, exist_ok=True)
+        
+        # Train models if needed
+        if not train_models_if_needed(model_dir):
+            model_load_error = "Failed to train models"
+            print("❌ Could not train models. API will be unavailable.")
             return
-
+        
+        print(f"📁 Loading models from: {model_dir}")
+        
         from weather_module import WeatherAPI
         
         print("📦 Importing WeatherAPI...")
