@@ -6,31 +6,6 @@ import { AlertCircle, CheckCircle } from "lucide-react"
 import { motion } from "framer-motion"
 import { AnimatedWeatherIcon } from "./animated-weather-icon"
 
-interface FuzzyProbBlockProps {
-  label: string
-  percent: number
-  color: string
-}
-
-function FuzzyProbBlock({ label, percent, color }: FuzzyProbBlockProps) {
-  return (
-    <div className="space-y-1">
-      <div className="flex justify-between text-sm">
-        <span className="text-muted-foreground">{label}</span>
-        <span className="font-medium">{percent.toFixed(1)}%</span>
-      </div>
-      <div className="w-full bg-muted rounded-full h-2 overflow-hidden">
-        <motion.div
-          className={`h-full ${color} rounded-full`}
-          initial={{ width: 0 }}
-          animate={{ width: `${percent}%` }}
-          transition={{ duration: 1, ease: "easeOut", delay: 0.2 }}
-        />
-      </div>
-    </div>
-  )
-}
-
 const getSeverityColor = (severity: number) => {
   if (severity < 0.3) return { label: "Low Risk", color: "bg-green-500/20 text-green-400 border-green-500/30" }
   if (severity < 0.7) return { label: "Medium Risk", color: "bg-yellow-500/20 text-yellow-400 border-yellow-500/30" }
@@ -47,8 +22,10 @@ const cardBackgrounds = {
 }
 
 export default function WeatherRiskCards({ data }: { data: any }) {
-  const { fuzzy_probabilities, assessment, predictions } = data
-
+  // Safely access nested properties with fallbacks
+  const assessment = data?.assessment || {}
+  const predictions = data?.predictions || {}
+  
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
@@ -66,6 +43,15 @@ export default function WeatherRiskCards({ data }: { data: any }) {
       y: 0,
       transition: { duration: 0.5 },
     },
+  }
+
+  // Check if we have required data
+  if (!assessment || !predictions) {
+    return (
+      <div className="text-center p-8 text-muted-foreground">
+        No weather data available
+      </div>
+    )
   }
 
   return (
@@ -99,13 +85,13 @@ export default function WeatherRiskCards({ data }: { data: any }) {
                 </motion.div>
                 Overall Assessment
               </CardTitle>
-              <Badge variant="outline" className={getSeverityColor(assessment.overall_risk).color}>
-                Risk: {Math.round(assessment.overall_risk * 100)}%
+              <Badge variant="outline" className={getSeverityColor(assessment.overall_risk || 0).color}>
+                Risk: {Math.round((assessment.overall_risk || 0) * 100)}%
               </Badge>
             </div>
           </CardHeader>
           <CardContent>
-            <p className="text-lg font-medium">{assessment.recommendation}</p>
+            <p className="text-lg font-medium">{assessment.recommendation || "No recommendation available"}</p>
           </CardContent>
         </Card>
       </motion.div>
@@ -131,12 +117,14 @@ export default function WeatherRiskCards({ data }: { data: any }) {
                   animate={{ scale: 1 }}
                   transition={{ type: "spring", stiffness: 200, delay: 0.2 }}
                 >
-                  {assessment.wind.category}
+                  {assessment.wind?.category || "Unknown"}
                 </motion.div>
-                <p className="text-xs text-muted-foreground mt-1">{predictions.wind_speed_ms.toFixed(2)} m/s</p>
+                <p className="text-xs text-muted-foreground mt-1">
+                  {(predictions.wind_speed_ms || 0).toFixed(2)} m/s
+                </p>
               </div>
-              <Badge variant="outline" className={getSeverityColor(assessment.wind.severity).color}>
-                {getSeverityColor(assessment.wind.severity).label}
+              <Badge variant="outline" className={getSeverityColor(assessment.wind?.severity || 0).color}>
+                {getSeverityColor(assessment.wind?.severity || 0).label}
               </Badge>
             </CardContent>
           </Card>
@@ -162,12 +150,14 @@ export default function WeatherRiskCards({ data }: { data: any }) {
                   animate={{ scale: 1 }}
                   transition={{ type: "spring", stiffness: 200, delay: 0.3 }}
                 >
-                  {assessment.precipitation.category}
+                  {assessment.precipitation?.category || "Unknown"}
                 </motion.div>
-                <p className="text-xs text-muted-foreground mt-1">{predictions.precipitation_mm.toFixed(2)} mm</p>
+                <p className="text-xs text-muted-foreground mt-1">
+                  {(predictions.precipitation_mm || 0).toFixed(2)} mm
+                </p>
               </div>
-              <Badge variant="outline" className={getSeverityColor(assessment.precipitation.severity).color}>
-                {getSeverityColor(assessment.precipitation.severity).label}
+              <Badge variant="outline" className={getSeverityColor(assessment.precipitation?.severity || 0).color}>
+                {getSeverityColor(assessment.precipitation?.severity || 0).label}
               </Badge>
             </CardContent>
           </Card>
@@ -193,12 +183,14 @@ export default function WeatherRiskCards({ data }: { data: any }) {
                   animate={{ scale: 1 }}
                   transition={{ type: "spring", stiffness: 200, delay: 0.4 }}
                 >
-                  {assessment.temperature.category}
+                  {assessment.temperature?.category || "Unknown"}
                 </motion.div>
-                <p className="text-xs text-muted-foreground mt-1">{predictions.temperature_c.toFixed(2)} °C</p>
+                <p className="text-xs text-muted-foreground mt-1">
+                  {(predictions.temperature_c || 0).toFixed(2)} °C
+                </p>
               </div>
-              <Badge variant="outline" className={getSeverityColor(assessment.temperature.severity).color}>
-                {getSeverityColor(assessment.temperature.severity).label}
+              <Badge variant="outline" className={getSeverityColor(assessment.temperature?.severity || 0).color}>
+                {getSeverityColor(assessment.temperature?.severity || 0).label}
               </Badge>
             </CardContent>
           </Card>
@@ -224,12 +216,14 @@ export default function WeatherRiskCards({ data }: { data: any }) {
                   animate={{ scale: 1 }}
                   transition={{ type: "spring", stiffness: 200, delay: 0.5 }}
                 >
-                  {assessment.humidity.category}
+                  {assessment.humidity?.category || "Unknown"}
                 </motion.div>
-                <p className="text-xs text-muted-foreground mt-1">{predictions.humidity_percent.toFixed(2)}%</p>
+                <p className="text-xs text-muted-foreground mt-1">
+                  {(predictions.humidity_percent || 0).toFixed(2)}%
+                </p>
               </div>
-              <Badge variant="outline" className={getSeverityColor(assessment.humidity.severity).color}>
-                {getSeverityColor(assessment.humidity.severity).label}
+              <Badge variant="outline" className={getSeverityColor(assessment.humidity?.severity || 0).color}>
+                {getSeverityColor(assessment.humidity?.severity || 0).label}
               </Badge>
             </CardContent>
           </Card>

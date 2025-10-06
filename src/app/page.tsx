@@ -21,25 +21,19 @@ interface LocationForecast {
     longitude: number
     name: string
   }
+  datetime?: string
+  hour?: number
   predictions: {
     wind_speed_ms: number
     precipitation_mm: number
     temperature_c: number
     humidity_percent: number
   }
-  fuzzy_probabilities: {
+  fuzzy_probabilities?: {
     wind: {
-      calm_percent: number
-      breezy_percent: number
-      windy_percent: number
-      very_windy_percent: number
       most_likely: string
     }
     precipitation: {
-      dry_percent: number
-      light_rain_percent: number
-      moderate_rain_percent: number
-      heavy_rain_percent: number
       most_likely: string
     }
   }
@@ -64,45 +58,29 @@ interface LocationForecast {
       severity: number
       safe: boolean
     }
+    overall_risk: number
+    safe_for_outdoors: boolean
+    recommendation: string
   }
-  statistics?: {
-    wind: {
-      mean: number
-      std: number
-      min: number
-      max: number
-      p25: number
-      p75: number
-      p90: number
-    }
-    precipitation: {
-      mean: number
-      std: number
-      min: number
-      max: number
-      p25: number
-      p75: number
-      p90: number
-    }
-    temperature: {
-      mean: number
-      std: number
-      min: number
-      max: number
-      p25: number
-      p75: number
-      p90: number
-    }
-    humidity: {
-      mean: number
-      std: number
-      min: number
-      max: number
-      p25: number
-      p75: number
-      p90: number
-    }
+}
+
+interface MultipleForecast {
+  location: {
+    latitude: number
+    longitude: number
+    name: string
   }
+  forecasts: Array<{
+    datetime: string
+    hour: number
+    predictions: {
+      wind_speed_ms: number
+      precipitation_mm: number
+      temperature_c: number
+      humidity_percent: number
+    }
+    assessment: any
+  }>
 }
 
 export default function WeatherDashboard() {
@@ -110,26 +88,26 @@ export default function WeatherDashboard() {
   const [date, setDate] = useState<Date>()
   const [time, setTime] = useState<string>("all")
   const [loading, setLoading] = useState(false)
-  const [weatherData, setWeatherData] = useState<LocationForecast | LocationForecast[] | null>(null)
+  const [weatherData, setWeatherData] = useState<LocationForecast | MultipleForecast | null>(null)
 
   const handleSearch = async () => {
     if (!selectedLocation || !date) return
 
     setLoading(true)
     try {
-      // Format date as YYYY-MM-DD
-      const targetDate = format(date, "yyyy-MM-dd")
-      
-      console.log("Sending request with params:", {
-        lat: selectedLocation.lat,
-        lon: selectedLocation.lon,
-        target_date: targetDate,
-        target_hour: time
+      const dateStr = format(date, "yyyy-MM-dd")
+      const response = await fetch(`/api/weather`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          lat: selectedLocation.lat,
+          lon: selectedLocation.lon,
+          date: dateStr,
+          time: time,
+        }),
       })
-      
-      const response = await fetch(
-        `/api/weather?lat=${selectedLocation.lat}&lon=${selectedLocation.lon}&target_date=${targetDate}&target_hour=${time}`
-      )
 
       if (!response.ok) {
         const errorData = await response.json()
@@ -142,29 +120,25 @@ export default function WeatherDashboard() {
         throw new Error(data.error)
       }
 
-      console.log("Received data:", data)
-
-      // Handle the new response format with forecast array
-      if (data.forecast && Array.isArray(data.forecast)) {
-        const enrichedForecasts = data.forecast.map((item: any) => ({
-          ...item,
-          location: {
-            latitude: data.location.latitude,
-            longitude: data.location.longitude,
-            name: `${selectedLocation.name}, ${selectedLocation.province}`,
-          },
-        }))
-        setWeatherData(enrichedForecasts)
-      } else {
-        // Fallback for single forecast format
-        const enrichedData = {
+      // Enrich with location name
+      if (data.forecasts) {
+        // Multiple forecasts (all day)
+        setWeatherData({
           ...data,
           location: {
             ...data.location,
             name: `${selectedLocation.name}, ${selectedLocation.province}`,
           },
-        }
-        setWeatherData(enrichedData)
+        })
+      } else {
+        // Single forecast
+        setWeatherData({
+          ...data,
+          location: {
+            ...data.location,
+            name: `${selectedLocation.name}, ${selectedLocation.province}`,
+          },
+        })
       }
     } catch (error) {
       console.error("Error fetching weather data:", error)
@@ -185,6 +159,10 @@ export default function WeatherDashboard() {
     link.download = `weather-insights-${selectedLocation.name}-${format(date!, "yyyy-MM-dd")}-${time === "all" ? "all-day" : `${time}h`}.json`
     link.click()
     URL.revokeObjectURL(url)
+  }
+
+  const isMultipleForecast = (data: any): data is MultipleForecast => {
+    return data && 'forecasts' in data
   }
 
   return (
@@ -243,7 +221,13 @@ export default function WeatherDashboard() {
                       </Button>
                     </PopoverTrigger>
                     <PopoverContent className="w-auto p-0" align="start">
-                      <Calendar mode="single" selected={date} onSelect={setDate} initialFocus />
+                      <Calendar 
+                        mode="single" 
+                        selected={date} 
+                        onSelect={setDate} 
+                        initialFocus
+                        disabled={(date) => date < new Date(new Date().setHours(0, 0, 0, 0))}
+                      />
                     </PopoverContent>
                   </Popover>
                 </div>
@@ -291,9 +275,9 @@ export default function WeatherDashboard() {
                     Weather Insights
                   </h2>
                   <p className="text-muted-foreground">
-                    {Array.isArray(weatherData) ? weatherData[0].location.name : weatherData.location.name} •{" "}
+                    {weatherData.location.name} •{" "}
                     {date ? format(date, "MMMM d, yyyy") : ""} •{" "}
-                    {time === "all" ? "All Day" : `${time.padStart(2, "0")}:00`}
+                    {time === "all" ? "All Day (Every 3 hours)" : `${time.padStart(2, "0")}:00`}
                   </p>
                 </div>
                 <Button
@@ -306,23 +290,19 @@ export default function WeatherDashboard() {
                 </Button>
               </div>
 
-              {Array.isArray(weatherData) ? (
+              {isMultipleForecast(weatherData) ? (
                 <div className="space-y-8">
-                  {weatherData.map((hourData, index) => (
+                  {weatherData.forecasts.map((hourData, index) => (
                     <div key={index} className="space-y-4">
                       <h3 className="text-xl font-semibold flex items-center gap-2">
-                        <span className="text-primary">{index.toString().padStart(2, "0")}:00</span>
+                        <span className="text-primary">{hourData.hour.toString().padStart(2, "0")}:00</span>
                       </h3>
                       <WeatherRiskCards data={hourData} />
                     </div>
                   ))}
-                  <WeatherChart data={weatherData[0]} />
                 </div>
               ) : (
-                <>
-                  <WeatherRiskCards data={weatherData} />
-                  <WeatherChart data={weatherData} />
-                </>
+                <WeatherRiskCards data={weatherData} />
               )}
             </motion.div>
           )}
@@ -353,8 +333,7 @@ export default function WeatherDashboard() {
                   </motion.div>
                   <h3 className="text-lg font-semibold mb-2">No data yet</h3>
                   <p className="text-muted-foreground max-w-sm">
-                    Select a location in the Philippines and date above to view weather risk insights and plan your
-                    outdoor activities
+                    Select a location in the Philippines, date, and time above to view weather risk insights
                   </p>
                 </CardContent>
               </Card>
