@@ -23,11 +23,11 @@ class WeatherAPI:
         
         # Load all pre-trained models
         model_files = {
-            'wind_u': 'wind_u_model.pkl',
-            'wind_v': 'wind_v_model.pkl',
-            'precipitation': 'precipitation_model.pkl',
-            'temperature': 'temperature_model.pkl',
-            'humidity': 'humidity_model.pkl'
+            'wind_u': 'wind_u.pkl',
+            'wind_v': 'wind_v.pkl',
+            'precipitation': 'precipitation.pkl',
+            'temperature': 'temperature.pkl',
+            'humidity': 'humidity.pkl'
         }
         
         for key, filename in model_files.items():
