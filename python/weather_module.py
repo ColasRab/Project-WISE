@@ -6,6 +6,7 @@ import pickle
 from datetime import datetime, timedelta
 from typing import Dict, List, Any
 import numpy as np
+import joblib
 
 
 class WeatherAPI:
@@ -33,9 +34,7 @@ class WeatherAPI:
         for key, filename in model_files.items():
             filepath = os.path.join(model_dir, filename)
             if os.path.exists(filepath):
-                with open(filepath, 'rb') as f:
-                    self.models[key] = pickle.load(f)
-                    print(f"✅ Loaded model: {key}")
+                self.models[key] = joblib.load(filepath)
             else:
                 print(f"⚠️  Model not found: {filepath}")
                 raise FileNotFoundError(f"Model file not found: {filepath}")
