@@ -25,8 +25,8 @@ class WeatherAPI:
         model_files = {
             'wind_u': 'wind_u.pkl',
             'wind_v': 'wind_v.pkl',
-            'precipitation': 'precipitation.pkl',
-            'temperature': 'temperature.pkl',
+            'precipitation': 'precip.pkl',
+            'temperature': 'temp.pkl',
             'humidity': 'humidity.pkl'
         }
         
