@@ -6,7 +6,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 import traceback
 import time
-from datetime import datetime, timedelta
+from datetime import datetime
 
 print("=" * 60)
 print("STARTING WEATHER SERVICE")
@@ -30,44 +30,43 @@ app.add_middleware(
 api = None
 model_load_error = None
 
+
 def train_models_if_needed(model_dir: str) -> bool:
     """Train models if they don't exist or are corrupted"""
     import subprocess
-    
+
     required_models = [
         'wind_u_model.pkl',
-        'wind_v_model.pkl', 
+        'wind_v_model.pkl',
         'precipitation_model.pkl',
         'temperature_model.pkl',
         'humidity_model.pkl'
     ]
-    
-    # Check if all models exist and are valid
+
     all_exist = all(os.path.exists(os.path.join(model_dir, m)) for m in required_models)
-    
+
     if not all_exist:
         print("📚 Models not found. Training now...")
         script_dir = os.path.dirname(os.path.abspath(__file__))
         train_script = os.path.join(script_dir, "train_models.py")
-        
+
         if not os.path.exists(train_script):
             print(f"❌ Training script not found: {train_script}")
             return False
-        
-        # Run training script
+
         result = subprocess.run(
             [sys.executable, train_script],
             capture_output=True,
             text=True
         )
-        
+
         if result.returncode != 0:
             print(f"❌ Training failed:\n{result.stderr}")
             return False
-        
+
         print(f"✅ Training output:\n{result.stdout}")
         return True
-    
+
     return True
 
 
@@ -83,24 +82,21 @@ async def startup_event():
     try:
         script_dir = os.path.dirname(os.path.abspath(__file__))
         model_dir = os.path.join(script_dir, "models")
-        
-        # Create models directory if it doesn't exist
         os.makedirs(model_dir, exist_ok=True)
-        
-        # Train models if needed
+
         if not train_models_if_needed(model_dir):
             model_load_error = "Failed to train models"
             print("❌ Could not train models. API will be unavailable.")
             return
-        
+
         print(f"📁 Loading models from: {model_dir}")
-        
+
         from weather_module import WeatherAPI
-        
+
         print("📦 Importing WeatherAPI...")
         api = WeatherAPI(model_dir=model_dir)
         print("✅ Pre-trained Prophet models loaded successfully!")
-        
+
     except Exception as e:
         model_load_error = str(e)
         print(f"❌ Failed to load models: {e}")
@@ -139,7 +135,6 @@ async def get_forecast(
     target_hour: str = Query("all", description="Target hour (0-23) or 'all' for full day")
 ):
     """Get weather forecast for a specific date and hour."""
-    
     start_time = time.time()
 
     if api is None:
@@ -154,77 +149,52 @@ async def get_forecast(
         )
 
     try:
-        # Parse target date
         target_dt = datetime.strptime(target_date, "%Y-%m-%d")
         now = datetime.now()
-        
-        # Calculate hours from now to target
+
         if target_hour == "all":
-            # For all day, we need forecasts at 0, 3, 6, 9, 12, 15, 18, 21 hours
-            # Calculate hours to the start of target day
             target_start = target_dt.replace(hour=0, minute=0, second=0, microsecond=0)
             hours_to_target = int((target_start - now).total_seconds() / 3600)
-            
-            # We need to forecast up to 21:00 on target day
             hours_needed = hours_to_target + 24
-            
-            print(f"🔮 Request: lat={lat}, lon={lon}, date={target_date}, time=ALL DAY")
-            print(f"   Hours from now to target date start: {hours_to_target}")
-            print(f"   Total hours needed: {hours_needed}")
-            
-            # Generate forecast with 3-hour intervals
+
             all_forecasts = api.get_forecast(hours=hours_needed, sample_every=3)
-            
-            # Filter for only the target date
-            target_date_str = target_date
             forecasts = [
-                f for f in all_forecasts 
-                if f['datetime'].startswith(target_date_str)
+                f for f in all_forecasts if f['datetime'].startswith(target_date)
             ]
-            
         else:
-            # For specific hour, just get that one forecast
             target_hour_int = int(target_hour)
             if target_hour_int < 0 or target_hour_int > 23:
                 return JSONResponse(
                     status_code=400,
                     content={"status": "error", "message": "Hour must be between 0 and 23"}
                 )
-            
+
             target_datetime = target_dt.replace(hour=target_hour_int, minute=0, second=0, microsecond=0)
             hours_to_target = int((target_datetime - now).total_seconds() / 3600)
-            
-            print(f"🔮 Request: lat={lat}, lon={lon}, date={target_date}, time={target_hour}:00")
-            print(f"   Hours from now to target: {hours_to_target}")
-            
+
             if hours_to_target < 0:
                 return JSONResponse(
                     status_code=400,
-                    content={
-                        "status": "error",
-                        "message": "Cannot forecast for past times"
-                    }
+                    content={"status": "error", "message": "Cannot forecast for past times"}
                 )
-            
-            # Generate just enough hours to reach the target (+1 for safety)
+
             all_forecasts = api.get_forecast(hours=hours_to_target + 2, sample_every=1)
-            
-            # Find the forecast closest to target time
             target_datetime_str = target_datetime.strftime("%Y-%m-%d %H:")
+
             forecasts = [
-                f for f in all_forecasts 
-                if f['datetime'].startswith(target_datetime_str)
+                f for f in all_forecasts if f['datetime'].startswith(target_datetime_str)
             ]
-            
+
             if not forecasts:
-                # If exact match not found, take the closest
                 forecasts = sorted(
                     all_forecasts,
                     key=lambda x: abs(
-                        datetime.fromisoformat(x['datetime'].replace('Z', '+00:00').replace(' ', 'T')) - target_datetime
+                        datetime.fromisoformat(
+                            x['datetime'].replace('Z', '+00:00').replace(' ', 'T')
+                        ) - target_datetime
                     )
                 )[:1]
-        
+
         elapsed = time.time() - start_time
         print(f"✅ Generated {len(forecasts)} forecast(s) in {elapsed:.2f}s")
 
@@ -277,19 +247,3 @@ async def get_forecast(
 print("=" * 60)
 print("✅ APP CREATED SUCCESSFULLY")
 print("=" * 60)
-
-if __name__ == "__main__":
-    import uvicorn
-
-    port = int(os.environ.get("PORT", 10000))
-    print("=" * 60)
-    print(f"🚀 Binding to 0.0.0.0:{port} (Render requires this)")
-    print("=" * 60)
-
-    uvicorn.run(
-        "weather_service:app", 
-        host="0.0.0.0", 
-        port=port, 
-        reload=False,
-        timeout_keep_alive=120
-    )
