@@ -2,9 +2,6 @@ services:
   - type: web
     name: weather-api
     env: python
-    plan: free
     buildCommand: "pip install -r requirements.txt"
-    startCommand: "uvicorn weather_service:app --host 0.0.0.0 --port $PORT --proxy-headers"
-    envVars:
-      - key: PORT
-        value: $PORT
+    startCommand: "python weather_service.py"
+    plan: free

@@ -173,8 +173,8 @@ def get_forecast(lat: float = Query(..., description="Latitude"),
 
 # This is CRITICAL for Render
 if __name__ == "__main__":
-    # Get port from environment variable (Render sets this)
-    port = int(os.environ.get("PORT", 8000))
+    port = int(os.environ.get("PORT", 10000))  # Render provides $PORT, default 10000
+    uvicorn.run("weather_service:app", host="0.0.0.0", port=port, reload=False)
     
     print(f"\n{'='*60}")
     print(f"🌤️  Weather API Server")
@@ -182,11 +182,3 @@ if __name__ == "__main__":
     print(f"Port: {port}")
     print(f"Host: 0.0.0.0")
     print(f"{'='*60}\n")
-    
-    # MUST bind to 0.0.0.0 for Render
-    uvicorn.run(
-        app, 
-        host="0.0.0.0", 
-        port=port,
-        log_level="info"
-    )
