@@ -41,7 +41,7 @@ async def startup_event():
         
         # Get the directory where this script is located
         script_dir = os.path.dirname(os.path.abspath(__file__))
-        base_dir = os.path.dirname(script_dir)  # Go up one level from python/
+        base_dir = script_dir
         data_dir = os.path.join(base_dir, "data", "processed")
         
         print(f"📁 Script directory: {script_dir}")
