@@ -12,8 +12,10 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: "Missing latitude or longitude" }, { status: 400 })
     }
 
-    // Request per-hour forecasts for 24 hours (or 168 for full week)
-    const hoursToFetch = time === "all" ? 24 : 24 // Fetch 24 hours worth
+    // If specific time requested, we still need to fetch multiple hours
+    // because Prophet generates forecasts from now onwards
+    // We'll fetch 24 hours and filter for the requested time
+    const hoursToFetch = 24
     const url = `https://project-wise.onrender.com/api/weather?lat=${lat}&lon=${lon}&hours=${hoursToFetch}`
 
     console.log("Fetching from backend:", url)
