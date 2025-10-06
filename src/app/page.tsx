@@ -9,6 +9,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { CalendarIcon, Download, Loader2, Sparkles } from "lucide-react"
 import { format } from "date-fns"
 import WeatherRiskCards from "@/components/weather-risk-cards"
+import WeatherChart from "@/components/weather-chart"
 import { LocationAutocomplete, PhilippineLocation } from "@/components/location-autocomplete"
 import { AnimatedWeatherIcon } from "@/components/animated-weather-icon"
 import { TimePicker } from "@/components/time-picker"
@@ -27,6 +28,14 @@ interface LocationForecast {
     precipitation_mm: number
     temperature_c: number
     humidity_percent: number
+  }
+  fuzzy_probabilities?: {
+    wind: {
+      most_likely: string
+    }
+    precipitation: {
+      most_likely: string
+    }
   }
   assessment: {
     wind: {
@@ -61,7 +70,17 @@ interface MultipleForecast {
     longitude: number
     name: string
   }
-  forecasts: LocationForecast[]
+  forecasts: Array<{
+    datetime: string
+    hour: number
+    predictions: {
+      wind_speed_ms: number
+      precipitation_mm: number
+      temperature_c: number
+      humidity_percent: number
+    }
+    assessment: any
+  }>
 }
 
 export default function WeatherDashboard() {
@@ -70,21 +89,6 @@ export default function WeatherDashboard() {
   const [time, setTime] = useState<string>("all")
   const [loading, setLoading] = useState(false)
   const [weatherData, setWeatherData] = useState<LocationForecast | MultipleForecast | null>(null)
-
-  // Transform backend response to frontend format
-  const transformForecastData = (backendData: any): LocationForecast => {
-    return {
-      location: backendData.location,
-      datetime: backendData.datetime,
-      predictions: {
-        wind_speed_ms: backendData.predicted_wind_speed || 0,
-        precipitation_mm: backendData.predicted_precip_mm || 0,
-        temperature_c: backendData.predicted_temp_c || 0,
-        humidity_percent: backendData.predicted_humidity || 0
-      },
-      assessment: backendData.assessment
-    }
-  }
 
   const handleSearch = async () => {
     if (!selectedLocation || !date) return
@@ -116,51 +120,29 @@ export default function WeatherDashboard() {
         throw new Error(data.error)
       }
 
-      console.log("Backend response:", data)
-
-      // Transform the data based on response structure
       if (data.forecast && Array.isArray(data.forecast)) {
-        if (data.forecast.length === 0) {
-          throw new Error("No forecast data available for the selected date and time")
-        }
+        data.forecast = data.forecast.map((item: any) => transformForecastData(item))
+      }
 
-        const locationName = `${selectedLocation.name}, ${selectedLocation.province}`
-
-        if (time === "all") {
-          // Multiple forecasts
-          const transformedForecasts = data.forecast.map((f: any) => {
-            const transformed = transformForecastData(f)
-            const hour = new Date(f.datetime).getHours()
-            return {
-              ...transformed,
-              hour,
-              location: {
-                ...data.location,
-                name: locationName
-              }
-            }
-          })
-
-          setWeatherData({
-            location: {
-              ...data.location,
-              name: locationName
-            },
-            forecasts: transformedForecasts
-          })
-        } else {
-          // Single forecast (take first one)
-          const transformed = transformForecastData(data.forecast[0])
-          setWeatherData({
-            ...transformed,
-            location: {
-              ...data.location,
-              name: locationName
-            }
-          })
-        }
+      // Enrich with location name
+      if (data.forecasts) {
+        // Multiple forecasts (all day)
+        setWeatherData({
+          ...data,
+          location: {
+            ...data.location,
+            name: `${selectedLocation.name}, ${selectedLocation.province}`,
+          },
+        })
       } else {
-        throw new Error("Invalid response format from backend")
+        // Single forecast
+        setWeatherData({
+          ...data,
+          location: {
+            ...data.location,
+            name: `${selectedLocation.name}, ${selectedLocation.province}`,
+          },
+        })
       }
     } catch (error) {
       console.error("Error fetching weather data:", error)
@@ -169,6 +151,13 @@ export default function WeatherDashboard() {
       setLoading(false)
     }
   }
+
+  const transformForecastData = (backendData: any) => {
+  return {
+    ...backendData,
+    predicted_temp_c: backendData.predicted_temp_c - 273.15 // Convert Kelvin to Celsius
+  }
+}
 
   const handleExport = () => {
     if (!weatherData || !selectedLocation) return
@@ -317,7 +306,7 @@ export default function WeatherDashboard() {
                   {weatherData.forecasts.map((hourData, index) => (
                     <div key={index} className="space-y-4">
                       <h3 className="text-xl font-semibold flex items-center gap-2">
-                        <span className="text-primary">{hourData.hour?.toString().padStart(2, "0")}:00</span>
+                        <span className="text-primary">{hourData.hour.toString().padStart(2, "0")}:00</span>
                       </h3>
                       <WeatherRiskCards data={hourData} />
                     </div>
