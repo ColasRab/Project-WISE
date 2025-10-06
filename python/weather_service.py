@@ -1,9 +1,11 @@
 # weather_service.py
 import os
 import sys
-from fastapi import FastAPI, Query, HTTPException
+from fastapi import FastAPI, Query, HTTPException, BackgroundTasks
 from fastapi.middleware.cors import CORSMiddleware
 from weather_module import WeatherAPI
+import threading
+
 
 print("=" * 60)
 print("STARTING WEATHER SERVICE")
@@ -30,41 +32,37 @@ api = None
 async def startup_event():
     global api
     port = os.environ.get("PORT", "8000")
-    print(f"=" * 60)
-    print(f"🚀 STARTUP EVENT TRIGGERED")
+    print("=" * 60)
+    print("🚀 STARTUP EVENT TRIGGERED")
     print(f"🚀 Server should start on 0.0.0.0:{port}")
-    print(f"=" * 60)
-    
-    # Load Prophet models
-    try:
-        print("📊 Loading weather data and training Prophet models...")
-        
-        # Get the directory where this script is located
-        script_dir = os.path.dirname(os.path.abspath(__file__))
-        base_dir = script_dir
-        data_dir = os.path.join(base_dir, "data", "processed")
-        
-        print(f"📁 Script directory: {script_dir}")
-        print(f"📁 Base directory: {base_dir}")
-        print(f"📁 Data directory: {data_dir}")
-        print(f"📁 Data exists: {os.path.exists(data_dir)}")
-        
-        if os.path.exists(data_dir):
-            print(f"📁 Files in data dir: {os.listdir(data_dir)}")
-        
-        api = WeatherAPI(
-            os.path.join(data_dir, "wind_u.csv"),
-            os.path.join(data_dir, "wind_v.csv"),
-            os.path.join(data_dir, "precipitation.csv"),
-            os.path.join(data_dir, "temperature.csv"),
-            os.path.join(data_dir, "humidity.csv")
-        )
-        print("✅ Prophet models loaded successfully!")
-    except Exception as e:
-        print(f"⚠️  Warning: Could not load Prophet models: {e}")
-        print("📝 API will return error instead")
-        import traceback
-        traceback.print_exc()
+    print("=" * 60)
+
+    def load_models():
+        global api
+        try:
+            print("📊 Loading weather data and training Prophet models (in background)...")
+            script_dir = os.path.dirname(os.path.abspath(__file__))
+            data_dir = os.path.join(script_dir, "data", "processed")
+
+            print(f"📁 Data directory: {data_dir}, exists={os.path.exists(data_dir)}")
+            if os.path.exists(data_dir):
+                print(f"📁 Files in data dir: {os.listdir(data_dir)}")
+
+            api = WeatherAPI(
+                os.path.join(data_dir, "wind_u.csv"),
+                os.path.join(data_dir, "wind_v.csv"),
+                os.path.join(data_dir, "precipitation.csv"),
+                os.path.join(data_dir, "temperature.csv"),
+                os.path.join(data_dir, "humidity.csv"),
+            )
+            print("✅ Prophet models loaded successfully!")
+        except Exception as e:
+            print(f"⚠️  Warning: Could not load Prophet models: {e}")
+            import traceback
+            traceback.print_exc()
+
+
+    threading.Thread(target=load_models, daemon=True).start()
 
 @app.get("/")
 def root():
