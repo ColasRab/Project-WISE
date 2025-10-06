@@ -180,3 +180,13 @@ def get_forecast(lat: float = Query(..., description="Latitude"),
 print("=" * 60)
 print("✅ APP CREATED SUCCESSFULLY")
 print("=" * 60)
+
+if __name__ == "__main__":
+    import uvicorn
+
+    port = int(os.environ.get("PORT", 10000))  # Render defaults to 10000
+    print("=" * 60)
+    print(f"🚀 Binding to 0.0.0.0:{port} (Render requires this)")
+    print("=" * 60)
+
+    uvicorn.run("weather_service:app", host="0.0.0.0", port=port, reload=False)
