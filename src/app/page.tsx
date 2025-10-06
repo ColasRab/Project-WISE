@@ -116,10 +116,6 @@ export default function WeatherDashboard() {
 
       const data = await response.json()
 
-      if (data.forecast && Array.isArray(data.forecast)) {
-        data.forecast = data.forecast.map((item: any) => transformForecastData(item))
-      }
-
       if (data.error) {
         throw new Error(data.error)
       }
@@ -149,13 +145,6 @@ export default function WeatherDashboard() {
       alert(error instanceof Error ? error.message : "Failed to fetch weather data")
     } finally {
       setLoading(false)
-    }
-  }
-
-  const transformForecastData = (backendData: any) => {
-    return {
-      ...backendData,
-      predicted_temp_c: backendData.predicted_temp_c - 273.15 // Convert Kelvin to Celsius
     }
   }
 
