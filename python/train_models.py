@@ -20,6 +20,12 @@ def train_and_save(csv_file, value_col="value", day_col="day", hour_col="hour", 
 
     df = pd.read_csv(path)
 
+    if "temperature" in csv_file:
+        df[value_col] = df[value_col] - 273.15   # Kelvin → Celsius
+    if "humidity" in csv_file and df[value_col].max() <= 1:
+        df[value_col] = df[value_col] * 100      # fraction → percent
+
+
     # Build hourly timestamp if day/hour/value exist
     if day_col in df.columns and hour_col in df.columns and value_col in df.columns:
         df["ds"] = pd.to_datetime(

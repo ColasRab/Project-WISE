@@ -71,9 +71,7 @@ export async function POST(request: NextRequest) {
         // Single forecast
         const fc = data.forecast[0]
         // Convert Kelvin to Celsius if needed
-        const tempC = fc.predicted_temp_c > 100 
-          ? fc.predicted_temp_c - 273.15 
-          : fc.predicted_temp_c
+        const tempC = fc.predicted_temp_c
         
         return NextResponse.json({
           location: data.location,
