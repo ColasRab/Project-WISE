@@ -1,6 +1,7 @@
-# weather_service.py
+# weather_service.py (patched for Render non-blocking startup)
 import os
 import sys
+import threading
 from fastapi import FastAPI, Query
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
@@ -26,81 +27,47 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Global API instance
+# Globals
 api = None
 model_load_error = None
+models_ready = False
 
 
-def train_models_if_needed(model_dir: str) -> bool:
-    """Train models if they don't exist or are corrupted"""
-    import subprocess
-
-    required_models = [
-        'wind_u_model.pkl',
-        'wind_v_model.pkl',
-        'precipitation_model.pkl',
-        'temperature_model.pkl',
-        'humidity_model.pkl'
-    ]
-
-    all_exist = all(os.path.exists(os.path.join(model_dir, m)) for m in required_models)
-
-    if not all_exist:
-        print("📚 Models not found. Training now...")
+def train_and_load_models():
+    """Run model training + load in a background thread"""
+    global api, model_load_error, models_ready
+    try:
         script_dir = os.path.dirname(os.path.abspath(__file__))
-        train_script = os.path.join(script_dir, "train_models.py")
+        model_dir = os.path.join(script_dir, "models")
+        os.makedirs(model_dir, exist_ok=True)
 
-        if not os.path.exists(train_script):
-            print(f"❌ Training script not found: {train_script}")
-            return False
+        from weather_module import WeatherAPI
 
-        result = subprocess.run(
-            [sys.executable, train_script],
-            capture_output=True,
-            text=True
-        )
+        # NOTE: You can add training here if needed, but avoid blocking startup
+        # Example:
+        # train_models_if_needed(model_dir)
 
-        if result.returncode != 0:
-            print(f"❌ Training failed:\n{result.stderr}")
-            return False
+        print("📦 Importing WeatherAPI...")
+        api = WeatherAPI(model_dir=model_dir)
+        models_ready = True
+        print("✅ Models loaded in background thread!")
 
-        print(f"✅ Training output:\n{result.stdout}")
-        return True
-
-    return True
+    except Exception as e:
+        model_load_error = str(e)
+        print(f"❌ Failed to load models in background: {e}")
+        traceback.print_exc()
 
 
 @app.on_event("startup")
 async def startup_event():
-    global api, model_load_error
     port = os.environ.get("PORT", "8000")
     print("=" * 60)
     print("🚀 STARTUP EVENT TRIGGERED")
     print(f"🚀 Server binding to 0.0.0.0:{port}")
     print("=" * 60)
 
-    try:
-        script_dir = os.path.dirname(os.path.abspath(__file__))
-        model_dir = os.path.join(script_dir, "models")
-        os.makedirs(model_dir, exist_ok=True)
-
-        if not train_models_if_needed(model_dir):
-            model_load_error = "Failed to train models"
-            print("❌ Could not train models. API will be unavailable.")
-            return
-
-        print(f"📁 Loading models from: {model_dir}")
-
-        from weather_module import WeatherAPI
-
-        print("📦 Importing WeatherAPI...")
-        api = WeatherAPI(model_dir=model_dir)
-        print("✅ Pre-trained Prophet models loaded successfully!")
-
-    except Exception as e:
-        model_load_error = str(e)
-        print(f"❌ Failed to load models: {e}")
-        traceback.print_exc()
+    # Spawn background thread so port binds immediately
+    threading.Thread(target=train_and_load_models, daemon=True).start()
 
 
 @app.get("/")
@@ -108,7 +75,7 @@ def root():
     return {
         "status": "Weather API is running",
         "version": "1.0",
-        "models_loaded": api is not None,
+        "models_loaded": models_ready,
         "model_load_error": model_load_error,
         "endpoints": {
             "health": "/health",
@@ -120,8 +87,8 @@ def root():
 @app.get("/health")
 def health():
     return {
-        "status": "healthy" if api is not None else "degraded",
-        "models_loaded": api is not None,
+        "status": "healthy" if models_ready else "loading",
+        "models_loaded": models_ready,
         "model_load_error": model_load_error,
         "port": os.environ.get("PORT", "8000")
     }
@@ -137,12 +104,12 @@ async def get_forecast(
     """Get weather forecast for a specific date and hour."""
     start_time = time.time()
 
-    if api is None:
+    if not models_ready or api is None:
         return JSONResponse(
             status_code=503,
             content={
                 "status": "loading",
-                "message": f"Models failed to load: {model_load_error or 'Unknown error'}",
+                "message": f"Models are still loading: {model_load_error or 'please retry shortly'}",
                 "location": {"latitude": lat, "longitude": lon},
                 "forecast": []
             }
@@ -158,9 +125,7 @@ async def get_forecast(
             hours_needed = hours_to_target + 24
 
             all_forecasts = api.get_forecast(hours=hours_needed, sample_every=3)
-            forecasts = [
-                f for f in all_forecasts if f['datetime'].startswith(target_date)
-            ]
+            forecasts = [f for f in all_forecasts if f['datetime'].startswith(target_date)]
         else:
             target_hour_int = int(target_hour)
             if target_hour_int < 0 or target_hour_int > 23:
@@ -181,9 +146,7 @@ async def get_forecast(
             all_forecasts = api.get_forecast(hours=hours_to_target + 2, sample_every=1)
             target_datetime_str = target_datetime.strftime("%Y-%m-%d %H:")
 
-            forecasts = [
-                f for f in all_forecasts if f['datetime'].startswith(target_datetime_str)
-            ]
+            forecasts = [f for f in all_forecasts if f['datetime'].startswith(target_datetime_str)]
 
             if not forecasts:
                 forecasts = sorted(
@@ -224,10 +187,7 @@ async def get_forecast(
     except ValueError as e:
         return JSONResponse(
             status_code=400,
-            content={
-                "status": "error",
-                "message": f"Invalid date format. Use YYYY-MM-DD: {str(e)}"
-            }
+            content={"status": "error", "message": f"Invalid date format. Use YYYY-MM-DD: {str(e)}"}
         )
     except Exception as e:
         print(f"❌ ERROR: {e}")
@@ -247,3 +207,4 @@ async def get_forecast(
 print("=" * 60)
 print("✅ APP CREATED SUCCESSFULLY")
 print("=" * 60)
+
