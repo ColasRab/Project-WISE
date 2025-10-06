@@ -42,7 +42,7 @@ export function LocationAutocomplete({ value, onChange }: LocationAutocompletePr
   const [loading, setLoading] = React.useState(false)
   const debounceTimeout = React.useRef<NodeJS.Timeout>()
 
-  // Fetch suggestions from Nominatim API
+  // Fetch suggestions via proxy API
   const fetchSuggestions = async (query: string) => {
     if (!query || query.length < 2) {
       setSuggestions([])
@@ -51,36 +51,19 @@ export function LocationAutocomplete({ value, onChange }: LocationAutocompletePr
 
     setLoading(true)
     try {
-      // Using Nominatim API (OpenStreetMap)
-      const response = await fetch(
-        `https://nominatim.openstreetmap.org/search?` +
-          new URLSearchParams({
-            q: query,
-            format: "json",
-            countrycodes: "ph", // Restrict to Philippines
-            limit: "10",
-            addressdetails: "1",
-          }),
-        {
-          headers: {
-            "User-Agent": "WeatherRiskDashboard/1.0", // Required by Nominatim
-          },
-        }
-      )
-
+      // Call your Next.js API route instead of Nominatim directly
+      const response = await fetch(`/api/location?q=${encodeURIComponent(query)}`)
       if (!response.ok) throw new Error("Failed to fetch suggestions")
 
       const data: NominatimResult[] = await response.json()
 
       const locations: PhilippineLocation[] = data.map((result) => {
-        // Extract city/town name
         const cityName =
           result.address.city ||
           result.address.town ||
           result.address.municipality ||
           "Unknown Location"
 
-        // Extract province/state
         const province = result.address.province || result.address.state || "Philippines"
 
         return {
@@ -109,7 +92,7 @@ export function LocationAutocomplete({ value, onChange }: LocationAutocompletePr
 
     debounceTimeout.current = setTimeout(() => {
       fetchSuggestions(searchQuery)
-    }, 500) // Wait 500ms after user stops typing
+    }, 500)
 
     return () => {
       if (debounceTimeout.current) {
