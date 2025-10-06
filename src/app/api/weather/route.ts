@@ -113,16 +113,18 @@ export async function POST(request: NextRequest) {
                 temperature_c: tempC || 0,
                 humidity_percent: fc.predicted_humidity || 0,
               },
-            assessment: fc.assessment || {
-              wind: { category: "Unknown", severity: 0, safe: true },
-              precipitation: { category: "Unknown", severity: 0, safe: true },
-              temperature: { category: "Unknown", severity: 0, safe: true },
-              humidity: { category: "Unknown", severity: 0, safe: true },
-              overall_risk: 0,
-              safe_for_outdoors: true,
-              recommendation: "No data available"
+              assessment: fc.assessment || {
+                wind: { category: "Unknown", severity: 0, safe: true },
+                precipitation: { category: "Unknown", severity: 0, safe: true },
+                temperature: { category: "Unknown", severity: 0, safe: true },
+                humidity: { category: "Unknown", severity: 0, safe: true },
+                overall_risk: 0,
+                safe_for_outdoors: true,
+                recommendation: "No data available"
+              }
             }
-          })
+          }
+          )
         })
       }
     }
