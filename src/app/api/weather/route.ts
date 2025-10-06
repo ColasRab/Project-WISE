@@ -12,33 +12,100 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: "Missing latitude or longitude" }, { status: 400 })
     }
 
-    if (time === "all") {
-      const promises = Array.from({ length: 24 }, (_, hour) =>
-        fetch(`https://project-wise.onrender.com/api/weather?lat=${lat}&lon=${lon}&hour=${hour}`, {
-          cache: "no-store",
-        }).then((res) => res.json()),
-      )
+    // Request per-hour forecasts for 24 hours (or 168 for full week)
+    const hoursToFetch = time === "all" ? 24 : 24 // Fetch 24 hours worth
+    const url = `https://project-wise.onrender.com/api/weather?lat=${lat}&lon=${lon}&hours=${hoursToFetch}`
 
-      const allData = await Promise.all(promises)
-      return NextResponse.json(allData)
-    }
-
-    const url = time
-      ? `https://project-wise.onrender.com/api/weather?lat=${lat}&lon=${lon}&hour=${time}`
-      : `https://project-wise.onrender.com/api/weather?lat=${lat}&lon=${lon}`
+    console.log("Fetching from backend:", url)
 
     const apiRes = await fetch(url, {
       cache: "no-store",
     })
 
     if (!apiRes.ok) {
+      const errorText = await apiRes.text()
+      console.error("Backend API error:", apiRes.status, errorText)
       throw new Error(`Backend API returned ${apiRes.status}`)
     }
 
     const data = await apiRes.json()
+    
+    if (data.status === "error") {
+      throw new Error(data.message || "Backend returned error status")
+    }
+
+    if (data.status === "loading") {
+      return NextResponse.json({
+        error: "Models are still loading. Please try again in a moment.",
+        status: "loading"
+      }, { status: 503 })
+    }
+
+    // If specific time requested, filter the forecast data
+    if (time && time !== "all" && data.forecast && Array.isArray(data.forecast)) {
+      const requestedHour = parseInt(time)
+      
+      // Find the forecast entry closest to the requested hour
+      const filteredForecasts = data.forecast.filter((entry: any) => {
+        const forecastDate = new Date(entry.datetime)
+        return forecastDate.getHours() === requestedHour
+      })
+
+      if (filteredForecasts.length > 0) {
+        // Return just the first matching forecast
+        const forecast = filteredForecasts[0]
+        
+        return NextResponse.json({
+          status: "success",
+          location: data.location,
+          predictions: {
+            wind_speed_ms: forecast.predicted_wind_u,
+            precipitation_mm: forecast.predicted_precip_mm,
+            temperature_c: forecast.predicted_temp_c,
+            humidity_percent: forecast.predicted_humidity,
+          },
+          assessment: forecast.assessment,
+          fuzzy_probabilities: {
+            wind: {
+              most_likely: forecast.assessment.wind.category,
+            },
+            precipitation: {
+              most_likely: forecast.assessment.precipitation.category,
+            },
+          },
+        })
+      }
+    }
+
+    // If "all" time or no specific match, return all forecasts formatted
+    if (data.forecast && Array.isArray(data.forecast)) {
+      return NextResponse.json({
+        status: "success",
+        location: data.location,
+        forecasts: data.forecast.map((entry: any) => ({
+          datetime: entry.datetime,
+          predictions: {
+            wind_speed_ms: Math.sqrt(
+              Math.pow(entry.predicted_wind_u, 2) + Math.pow(entry.predicted_wind_v, 2)
+            ),
+            precipitation_mm: entry.predicted_precip_mm,
+            temperature_c: entry.predicted_temp_c,
+            humidity_percent: entry.predicted_humidity,
+          },
+          assessment: entry.assessment,
+        })),
+      })
+    }
+
     return NextResponse.json(data)
   } catch (error) {
     console.error("Error fetching weather data:", error)
-    return NextResponse.json({ error: "Failed to fetch weather data" }, { status: 500 })
+    return NextResponse.json(
+      { 
+        error: error instanceof Error ? error.message : "Failed to fetch weather data",
+        details: error instanceof Error ? error.stack : undefined
+      }, 
+      { status: 500 }
+    )
   }
 }

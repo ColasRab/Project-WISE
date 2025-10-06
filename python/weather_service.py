@@ -62,7 +62,7 @@ def root():
         "models_loaded": api is not None,
         "endpoints": {
             "health": "/health",
-            "weather": "/api/weather?lat={latitude}&lon={longitude}"
+            "weather": "/api/weather?lat={latitude}&lon={longitude}&hours={hours}"
         }
     }
 
@@ -80,7 +80,7 @@ def health():
 def get_forecast(
     lat: float = Query(..., description="Latitude"),
     lon: float = Query(..., description="Longitude"),
-    hours: int = Query(168, description="Forecast horizon in hours (default: 168 = 7 days)")
+    hours: int = Query(24, description="Forecast horizon in hours (default: 24)")
 ):
     """Get weather forecast for a specific location (hourly resolution)."""
 
@@ -94,7 +94,8 @@ def get_forecast(
 
     try:
         print(f"🔮 Generating forecast for lat={lat}, lon={lon}, hours={hours}")
-        forecasts = api.get_forecast(hours=hours, sample_every=3)  # every 3 hours
+        # Changed sample_every=1 for hourly forecasts
+        forecasts = api.get_forecast(hours=hours, sample_every=1)
 
         if not forecasts:
             return {
