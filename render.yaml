@@ -1,7 +1,8 @@
 services:
   - type: web
-    name: weather-api
+    name: weather-service
     env: python
-    buildCommand: "pip install -r requirements.txt"
-    startCommand: "python weather_service.py"
-    plan: free
+    buildCommand: |
+      pip install -r requirements.txt
+      python train_models.py
+    startCommand: uvicorn weather_service:app --host 0.0.0.0 --port $PORT
