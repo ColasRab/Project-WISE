@@ -116,12 +116,12 @@ export default function WeatherDashboard() {
 
       const data = await response.json()
 
-      if (data.error) {
-        throw new Error(data.error)
-      }
-
       if (data.forecast && Array.isArray(data.forecast)) {
         data.forecast = data.forecast.map((item: any) => transformForecastData(item))
+      }
+
+      if (data.error) {
+        throw new Error(data.error)
       }
 
       // Enrich with location name
@@ -153,11 +153,11 @@ export default function WeatherDashboard() {
   }
 
   const transformForecastData = (backendData: any) => {
-  return {
-    ...backendData,
-    predicted_temp_c: backendData.predicted_temp_c - 273.15 // Convert Kelvin to Celsius
+    return {
+      ...backendData,
+      predicted_temp_c: backendData.predicted_temp_c - 273.15 // Convert Kelvin to Celsius
+    }
   }
-}
 
   const handleExport = () => {
     if (!weatherData || !selectedLocation) return
