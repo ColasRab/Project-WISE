@@ -102,11 +102,11 @@ export default function WeatherDashboard() {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          lat: selectedLocation.lat,
-          lon: selectedLocation.lon,
-          date: dateStr,
-          time: time,
-        }),
+        lat: selectedLocation.lat,
+        lon: selectedLocation.lon,
+        target_date: dateStr,
+        target_hour: time,
+      }),
       })
 
       if (!response.ok) {
