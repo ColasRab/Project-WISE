@@ -42,7 +42,7 @@ export async function GET(request: Request) {
     }
 
     // Get the backend API URL from environment variable
-    const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:8000';
+    const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || 'https://project-wise.onrender.com';
     
     console.log(`Fetching weather data from: ${BACKEND_URL}/api/weather?lat=${latitude}&lon=${longitude}`);
 
