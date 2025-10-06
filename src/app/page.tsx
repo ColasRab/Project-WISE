@@ -117,7 +117,19 @@ export default function WeatherDashboard() {
 
     setLoading(true)
     try {
-      const response = await fetch(`/api/weather?lat=${selectedLocation.lat}&lon=${selectedLocation.lon}&time=${time}`)
+      // Format date as YYYY-MM-DD
+      const targetDate = format(date, "yyyy-MM-dd")
+      
+      console.log("Sending request with params:", {
+        lat: selectedLocation.lat,
+        lon: selectedLocation.lon,
+        target_date: targetDate,
+        target_hour: time
+      })
+      
+      const response = await fetch(
+        `/api/weather?lat=${selectedLocation.lat}&lon=${selectedLocation.lon}&target_date=${targetDate}&target_hour=${time}`
+      )
 
       if (!response.ok) {
         const errorData = await response.json()
@@ -130,16 +142,21 @@ export default function WeatherDashboard() {
         throw new Error(data.error)
       }
 
-      if (Array.isArray(data)) {
-        const enrichedData = data.map((item) => ({
+      console.log("Received data:", data)
+
+      // Handle the new response format with forecast array
+      if (data.forecast && Array.isArray(data.forecast)) {
+        const enrichedForecasts = data.forecast.map((item: any) => ({
           ...item,
           location: {
-            ...item.location,
+            latitude: data.location.latitude,
+            longitude: data.location.longitude,
             name: `${selectedLocation.name}, ${selectedLocation.province}`,
           },
         }))
-        setWeatherData(enrichedData)
+        setWeatherData(enrichedForecasts)
       } else {
+        // Fallback for single forecast format
         const enrichedData = {
           ...data,
           location: {

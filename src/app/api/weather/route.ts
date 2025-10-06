@@ -7,6 +7,8 @@ export async function GET(request: NextRequest) {
   const targetDate = searchParams.get("target_date")
   const targetHour = searchParams.get("target_hour") || "all"
 
+  console.log("Received params:", { lat, lon, targetDate, targetHour })
+
   if (!lat || !lon || !targetDate) {
     return NextResponse.json(
       { error: "Missing required parameters: lat, lon, and target_date are required" },
@@ -25,7 +27,13 @@ export async function GET(request: NextRequest) {
     url.searchParams.set("target_date", targetDate)
     url.searchParams.set("target_hour", targetHour)
 
-    console.log(`Fetching weather from: ${url.toString()}`)
+    console.log("Fetching weather data from:", url.toString())
+    console.log("Parameters being sent:", {
+      lat,
+      lon,
+      target_date: targetDate,
+      target_hour: targetHour
+    })
 
     const response = await fetch(url.toString(), {
       method: "GET",
