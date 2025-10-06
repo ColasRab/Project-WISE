@@ -3,11 +3,11 @@ import { NextRequest, NextResponse } from "next/server"
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
-    const { lat, lon, date, time } = body
+    const { lat, lon, target_date, target_hour } = body
 
-    console.log("Received body params:", { lat, lon, date, time })
+    console.log("Received body params:", { lat, lon, target_date, target_hour })
 
-    if (!lat || !lon || !date) {
+    if (!lat || !lon || !target_date || !target_hour) {
       return NextResponse.json(
         { error: "Missing required parameters: lat, lon, and date are required" },
         { status: 400 }
@@ -21,8 +21,8 @@ export async function POST(request: NextRequest) {
     const url = new URL("/api/weather", backendUrl)
     url.searchParams.set("lat", lat.toString())
     url.searchParams.set("lon", lon.toString())
-    url.searchParams.set("target_date", date)
-    url.searchParams.set("target_hour", time || "all")
+    url.searchParams.set("target_date", target_date)
+    url.searchParams.set("target_hour", target_hour || "all")
 
     console.log("Fetching weather data from backend:", url.toString())
 
