@@ -6,12 +6,28 @@ export async function GET(request: NextRequest) {
     const searchParams = request.nextUrl.searchParams
     const lat = searchParams.get("lat")
     const lon = searchParams.get("lon")
+    const time = searchParams.get("time")
 
     if (!lat || !lon) {
       return NextResponse.json({ error: "Missing latitude or longitude" }, { status: 400 })
     }
 
-    const apiRes = await fetch(`https://project-wise.onrender.com/api/weather?lat=${lat}&lon=${lon}`, {
+    if (time === "all") {
+      const promises = Array.from({ length: 24 }, (_, hour) =>
+        fetch(`https://project-wise.onrender.com/api/weather?lat=${lat}&lon=${lon}&hour=${hour}`, {
+          cache: "no-store",
+        }).then((res) => res.json()),
+      )
+
+      const allData = await Promise.all(promises)
+      return NextResponse.json(allData)
+    }
+
+    const url = time
+      ? `https://project-wise.onrender.com/api/weather?lat=${lat}&lon=${lon}&hour=${time}`
+      : `https://project-wise.onrender.com/api/weather?lat=${lat}&lon=${lon}`
+
+    const apiRes = await fetch(url, {
       cache: "no-store",
     })
 

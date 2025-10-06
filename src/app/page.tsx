@@ -12,6 +12,7 @@ import WeatherRiskCards from "@/components/weather-risk-cards"
 import WeatherChart from "@/components/weather-chart"
 import { LocationAutocomplete, PhilippineLocation } from "@/components/location-autocomplete"
 import { AnimatedWeatherIcon } from "@/components/animated-weather-icon"
+import { TimePicker } from "@/components/time-picker"
 import { motion, AnimatePresence } from "framer-motion"
 
 interface LocationForecast {
@@ -63,9 +64,6 @@ interface LocationForecast {
       severity: number
       safe: boolean
     }
-    overall_risk: number
-    safe_for_outdoors: boolean
-    recommendation: string
   }
   statistics?: {
     wind: {
@@ -110,15 +108,16 @@ interface LocationForecast {
 export default function WeatherDashboard() {
   const [selectedLocation, setSelectedLocation] = useState<PhilippineLocation | null>(null)
   const [date, setDate] = useState<Date>()
+  const [time, setTime] = useState<string>("all")
   const [loading, setLoading] = useState(false)
-  const [weatherData, setWeatherData] = useState<LocationForecast | null>(null)
+  const [weatherData, setWeatherData] = useState<LocationForecast | LocationForecast[] | null>(null)
 
   const handleSearch = async () => {
     if (!selectedLocation || !date) return
 
     setLoading(true)
     try {
-      const response = await fetch(`/api/weather?lat=${selectedLocation.lat}&lon=${selectedLocation.lon}`)
+      const response = await fetch(`/api/weather?lat=${selectedLocation.lat}&lon=${selectedLocation.lon}&time=${time}`)
 
       if (!response.ok) {
         const errorData = await response.json()
@@ -131,15 +130,25 @@ export default function WeatherDashboard() {
         throw new Error(data.error)
       }
 
-      const enrichedData = {
-        ...data,
-        location: {
-          ...data.location,
-          name: `${selectedLocation.name}, ${selectedLocation.province}`,
-        },
+      if (Array.isArray(data)) {
+        const enrichedData = data.map((item) => ({
+          ...item,
+          location: {
+            ...item.location,
+            name: `${selectedLocation.name}, ${selectedLocation.province}`,
+          },
+        }))
+        setWeatherData(enrichedData)
+      } else {
+        const enrichedData = {
+          ...data,
+          location: {
+            ...data.location,
+            name: `${selectedLocation.name}, ${selectedLocation.province}`,
+          },
+        }
+        setWeatherData(enrichedData)
       }
-
-      setWeatherData(enrichedData)
     } catch (error) {
       console.error("Error fetching weather data:", error)
       alert(error instanceof Error ? error.message : "Failed to fetch weather data")
@@ -156,7 +165,7 @@ export default function WeatherDashboard() {
     const url = URL.createObjectURL(dataBlob)
     const link = document.createElement("a")
     link.href = url
-    link.download = `weather-insights-${selectedLocation.name}-${format(date!, "yyyy-MM-dd")}.json`
+    link.download = `weather-insights-${selectedLocation.name}-${format(date!, "yyyy-MM-dd")}-${time === "all" ? "all-day" : `${time}h`}.json`
     link.click()
     URL.revokeObjectURL(url)
   }
@@ -222,6 +231,8 @@ export default function WeatherDashboard() {
                   </Popover>
                 </div>
 
+                <TimePicker value={time} onChange={setTime} />
+
                 <div className="flex items-end">
                   <Button
                     onClick={handleSearch}
@@ -263,7 +274,9 @@ export default function WeatherDashboard() {
                     Weather Insights
                   </h2>
                   <p className="text-muted-foreground">
-                    {weatherData.location.name} • {date ? format(date, "MMMM d, yyyy") : ""}
+                    {Array.isArray(weatherData) ? weatherData[0].location.name : weatherData.location.name} •{" "}
+                    {date ? format(date, "MMMM d, yyyy") : ""} •{" "}
+                    {time === "all" ? "All Day" : `${time.padStart(2, "0")}:00`}
                   </p>
                 </div>
                 <Button
@@ -276,8 +289,24 @@ export default function WeatherDashboard() {
                 </Button>
               </div>
 
-              <WeatherRiskCards data={weatherData} />
-              <WeatherChart data={weatherData} />
+              {Array.isArray(weatherData) ? (
+                <div className="space-y-8">
+                  {weatherData.map((hourData, index) => (
+                    <div key={index} className="space-y-4">
+                      <h3 className="text-xl font-semibold flex items-center gap-2">
+                        <span className="text-primary">{index.toString().padStart(2, "0")}:00</span>
+                      </h3>
+                      <WeatherRiskCards data={hourData} />
+                    </div>
+                  ))}
+                  <WeatherChart data={weatherData[0]} />
+                </div>
+              ) : (
+                <>
+                  <WeatherRiskCards data={weatherData} />
+                  <WeatherChart data={weatherData} />
+                </>
+              )}
             </motion.div>
           )}
 
