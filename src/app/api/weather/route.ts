@@ -22,7 +22,7 @@ export async function POST(request: NextRequest) {
     url.searchParams.set("lat", lat.toString())
     url.searchParams.set("lon", lon.toString())
     url.searchParams.set("target_date", target_date)
-    url.searchParams.set("target_hour", target_hour || "all")
+    url.searchParams.set("target_hour", String(target_hour || "all"))
 
     console.log("Fetching weather data from backend:", url.toString())
 
