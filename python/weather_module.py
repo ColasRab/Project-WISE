@@ -1,5 +1,5 @@
 """
-Weather Module - Loads pre-trained Prophet models and generates forecasts
+Optimized Weather Module - Fast forecasts for long-range predictions
 """
 import os
 import pickle
@@ -39,9 +39,118 @@ class WeatherAPI:
                 print(f"⚠️  Model not found: {filepath}")
                 raise FileNotFoundError(f"Model file not found: {filepath}")
     
+    def get_forecast_for_datetime(self, target_datetime: datetime) -> Dict[str, Any]:
+        """
+        Generate weather forecast for a specific datetime (optimized)
+        
+        Args:
+            target_datetime: The exact datetime to forecast
+            
+        Returns:
+            Single forecast dictionary with weather data and assessment
+        """
+        if not self.models:
+            raise Exception("No models loaded")
+        
+        import pandas as pd
+        
+        # Create DataFrame with just the target datetime
+        future_df = pd.DataFrame({'ds': [target_datetime]})
+        
+        # Get predictions from all models in batch
+        predictions = {}
+        for key, model in self.models.items():
+            forecast = model.predict(future_df)
+            predictions[key] = forecast['yhat'].values[0]
+        
+        # Calculate derived values
+        wind_u = predictions['wind_u']
+        wind_v = predictions['wind_v']
+        wind_speed = np.sqrt(wind_u**2 + wind_v**2)
+        precip = max(0, predictions['precipitation'])
+        temp = predictions['temperature']
+        humidity = max(0, min(100, predictions['humidity']))
+        
+        # Assess conditions
+        assessment = self._assess_conditions(wind_speed, precip, temp, humidity)
+        
+        return {
+            'datetime': target_datetime.strftime('%Y-%m-%d %H:%M:%S'),
+            'timestamp': int(target_datetime.timestamp()),
+            'predicted_wind_u': round(float(wind_u), 2),
+            'predicted_wind_v': round(float(wind_v), 2),
+            'predicted_wind_speed': round(float(wind_speed), 2),
+            'predicted_precip_mm': round(float(precip), 2),
+            'predicted_temp_c': round(float(temp), 2),
+            'predicted_humidity': round(float(humidity), 2),
+            'assessment': assessment
+        }
+    
+    def get_forecast_for_day(self, target_date: datetime, sample_every: int = 3) -> List[Dict[str, Any]]:
+        """
+        Generate weather forecast for a full day (optimized)
+        
+        Args:
+            target_date: The target date (time will be ignored)
+            sample_every: Sample interval in hours (e.g., 3 = every 3 hours)
+            
+        Returns:
+            List of forecast dictionaries for the day
+        """
+        if not self.models:
+            raise Exception("No models loaded")
+        
+        import pandas as pd
+        
+        # Create list of datetimes for the target day
+        start_of_day = target_date.replace(hour=0, minute=0, second=0, microsecond=0)
+        future_dates = []
+        
+        for hour in range(0, 24, sample_every):
+            future_dates.append(start_of_day + timedelta(hours=hour))
+        
+        # Create DataFrame for all target times at once
+        future_df = pd.DataFrame({'ds': future_dates})
+        
+        # Get predictions from all models in batch (much faster!)
+        predictions = {}
+        for key, model in self.models.items():
+            forecast = model.predict(future_df)
+            predictions[key] = forecast['yhat'].values
+        
+        # Build forecast results
+        forecasts = []
+        
+        for i, dt in enumerate(future_dates):
+            wind_u = predictions['wind_u'][i]
+            wind_v = predictions['wind_v'][i]
+            wind_speed = np.sqrt(wind_u**2 + wind_v**2)
+            precip = max(0, predictions['precipitation'][i])
+            temp = predictions['temperature'][i]
+            humidity = max(0, min(100, predictions['humidity'][i]))
+            
+            # Assess conditions
+            assessment = self._assess_conditions(wind_speed, precip, temp, humidity)
+            
+            forecast_item = {
+                'datetime': dt.strftime('%Y-%m-%d %H:%M:%S'),
+                'timestamp': int(dt.timestamp()),
+                'predicted_wind_u': round(float(wind_u), 2),
+                'predicted_wind_v': round(float(wind_v), 2),
+                'predicted_wind_speed': round(float(wind_speed), 2),
+                'predicted_precip_mm': round(float(precip), 2),
+                'predicted_temp_c': round(float(temp), 2),
+                'predicted_humidity': round(float(humidity), 2),
+                'assessment': assessment
+            }
+            
+            forecasts.append(forecast_item)
+        
+        return forecasts
+    
     def get_forecast(self, hours: int = 24, sample_every: int = 3) -> List[Dict[str, Any]]:
         """
-        Generate weather forecast for the next N hours
+        Generate weather forecast for the next N hours (legacy method)
         
         Args:
             hours: Number of hours to forecast
@@ -78,9 +187,9 @@ class WeatherAPI:
             wind_u = predictions['wind_u'][i]
             wind_v = predictions['wind_v'][i]
             wind_speed = np.sqrt(wind_u**2 + wind_v**2)
-            precip = max(0, predictions['precipitation'][i])  # Can't be negative
+            precip = max(0, predictions['precipitation'][i])
             temp = predictions['temperature'][i]
-            humidity = max(0, min(100, predictions['humidity'][i]))  # Clamp 0-100
+            humidity = max(0, min(100, predictions['humidity'][i]))
             
             # Assess conditions
             assessment = self._assess_conditions(wind_speed, precip, temp, humidity)
