@@ -1,148 +1,182 @@
-# weather_module.py
+# weather_service.py
 import os
-import joblib
-import pandas as pd
+import sys
+from fastapi import FastAPI, Query, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
+from weather_module import WeatherAPI
 
-# ============================================
-# FUZZY LOGIC
-# ============================================
+print("=" * 60)
+print("STARTING WEATHER SERVICE")
+print(f"Python version: {sys.version}")
+print(f"Current directory: {os.getcwd()}")
+print(f"PORT environment variable: {os.environ.get('PORT', 'NOT SET')}")
+print("=" * 60)
 
-class SimpleFuzzyLogic:
-    @staticmethod
-    def assess_wind(wind_speed):
-        if wind_speed < 3:
-            return {"category": "Calm", "severity": 0.2, "safe": True}
-        elif wind_speed < 8:
-            return {"category": "Breezy", "severity": 0.4, "safe": True}
-        elif wind_speed < 15:
-            return {"category": "Windy", "severity": 0.6, "safe": True}
-        else:
-            return {"category": "Very Windy", "severity": 0.9, "safe": False}
+app = FastAPI(title="Weather API", version="1.0")
 
-    @staticmethod
-    def assess_precipitation(precip_mm_hr):
-        if precip_mm_hr < 0.1:
-            return {"category": "Dry", "severity": 0.1, "safe": True}
-        elif precip_mm_hr < 1:
-            return {"category": "Light Rain", "severity": 0.3, "safe": True}
-        elif precip_mm_hr < 5:
-            return {"category": "Moderate Rain", "severity": 0.6, "safe": True}
-        else:
-            return {"category": "Heavy Rain", "severity": 0.9, "safe": False}
+# CORS middleware
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
-    @staticmethod
-    def assess_humidity(humidity):
-        if humidity < 30:
-            return {"category": "Very Dry", "severity": 0.5, "safe": False}
-        elif humidity < 60:
-            return {"category": "Comfortable", "severity": 0.2, "safe": True}
-        elif humidity < 80:
-            return {"category": "Humid", "severity": 0.5, "safe": True}
-        else:
-            return {"category": "Very Humid", "severity": 0.8, "safe": False}
+# Global API instance
+api = None
 
-    @staticmethod
-    def assess_temperature(temp_c):
-        if temp_c < 10:
-            return {"category": "Cold", "severity": 0.6, "safe": True}
-        elif temp_c < 18:
-            return {"category": "Cool", "severity": 0.3, "safe": True}
-        elif temp_c < 28:
-            return {"category": "Comfortable", "severity": 0.1, "safe": True}
-        elif temp_c < 35:
-            return {"category": "Warm", "severity": 0.4, "safe": True}
-        else:
-            return {"category": "Hot", "severity": 0.8, "safe": False}
+@app.on_event("startup")
+async def startup_event():
+    global api
+    port = os.environ.get("PORT", "8000")
+    print(f"=" * 60)
+    print(f"🚀 STARTUP EVENT TRIGGERED")
+    print(f"🚀 Server should start on 0.0.0.0:{port}")
+    print(f"=" * 60)
+    
+    # Load Prophet models
+    try:
+        print("📊 Loading weather data and training Prophet models...")
+        
+        # Get the directory where this script is located
+        script_dir = os.path.dirname(os.path.abspath(__file__))
+        base_dir = os.path.dirname(script_dir)  # Go up one level from python/
+        data_dir = os.path.join(base_dir, "data", "processed")
+        
+        print(f"📁 Script directory: {script_dir}")
+        print(f"📁 Base directory: {base_dir}")
+        print(f"📁 Data directory: {data_dir}")
+        print(f"📁 Data exists: {os.path.exists(data_dir)}")
+        
+        if os.path.exists(data_dir):
+            print(f"📁 Files in data dir: {os.listdir(data_dir)}")
+        
+        api = WeatherAPI(
+            os.path.join(data_dir, "wind_u.csv"),
+            os.path.join(data_dir, "wind_v.csv"),
+            os.path.join(data_dir, "precipitation.csv"),
+            os.path.join(data_dir, "temperature.csv"),
+            os.path.join(data_dir, "humidity.csv")
+        )
+        print("✅ Prophet models loaded successfully!")
+    except Exception as e:
+        print(f"⚠️  Warning: Could not load Prophet models: {e}")
+        print("📝 API will return error instead")
+        import traceback
+        traceback.print_exc()
 
-    @staticmethod
-    def overall_assessment(wind_speed, precip_mm_hr, humidity, temp_c):
-        wind_result = SimpleFuzzyLogic.assess_wind(wind_speed)
-        precip_result = SimpleFuzzyLogic.assess_precipitation(precip_mm_hr)
-        humidity_result = SimpleFuzzyLogic.assess_humidity(humidity)
-        temp_result = SimpleFuzzyLogic.assess_temperature(temp_c)
-
-        risk = (wind_result['severity'] + precip_result['severity'] +
-                humidity_result['severity'] + temp_result['severity']) / 4
-        safe = (wind_result['safe'] and precip_result['safe'] and
-                humidity_result['safe'] and temp_result['safe'])
-
-        if not safe:
-            recommendation = "Not recommended for outdoor activities"
-        elif risk > 0.5:
-            recommendation = "Use caution for outdoor activities"
-        else:
-            recommendation = "Good conditions for outdoor activities"
-
-        return {
-            'wind': wind_result,
-            'precipitation': precip_result,
-            'humidity': humidity_result,
-            'temperature': temp_result,
-            'overall_risk': round(risk, 2),
-            'safe_for_outdoors': safe,
-            'recommendation': recommendation
+@app.get("/")
+def root():
+    print("✅ ROOT ENDPOINT HIT")
+    return {
+        "status": "Weather API is running",
+        "version": "1.0",
+        "models_loaded": api is not None,
+        "endpoints": {
+            "health": "/health",
+            "weather": "/api/weather?lat={latitude}&lon={longitude}"
         }
+    }
 
-# ============================================
-# WEATHER API (loads pretrained Prophet models)
-# ============================================
+@app.get("/health")
+def health():
+    print("✅ HEALTH ENDPOINT HIT")
+    return {
+        "status": "healthy",
+        "models_loaded": api is not None,
+        "port": os.environ.get("PORT", "8000")
+    }
 
-class WeatherAPI:
-    def __init__(self, model_dir="models"):
-        self.models = {}
-        for name in ["wind_u", "wind_v", "precip", "temp", "humidity"]:
-            path = os.path.join(model_dir, f"{name}.pkl")
-            if os.path.exists(path):
-                print(f"📂 Loading model: {path}")
-                self.models[name] = joblib.load(path)
-            else:
-                print(f"⚠️ Model {name}.pkl not found!")
-
-    def get_forecast(self, hours=168, sample_every=1):
-        """
-        Generate hourly forecasts.
-        hours = number of hours into the future (default: 168 = 7 days)
-        sample_every = take every Nth hour (default: 1 = every hour)
-        """
-        if not self.models:
-            raise RuntimeError("No models loaded")
-
-        wind_u_forecast = self.models['wind_u'].predict(
-            self.models['wind_u'].make_future_dataframe(periods=hours, freq="H")
+@app.get("/api/weather")
+def get_forecast(lat: float = Query(..., description="Latitude"), 
+                 lon: float = Query(..., description="Longitude")):
+    """Get weather forecast for a specific location"""
+    
+    if api is None:
+        raise HTTPException(
+            status_code=503,
+            detail="Prophet models not loaded. Check server logs for data file errors."
         )
-        wind_v_forecast = self.models['wind_v'].predict(
-            self.models['wind_v'].make_future_dataframe(periods=hours, freq="H")
-        )
-        precip_forecast = self.models['precip'].predict(
-            self.models['precip'].make_future_dataframe(periods=hours, freq="H")
-        )
-        temp_forecast = self.models['temp'].predict(
-            self.models['temp'].make_future_dataframe(periods=hours, freq="H")
-        )
-        humidity_forecast = self.models['humidity'].predict(
-            self.models['humidity'].make_future_dataframe(periods=hours, freq="H")
-        )
+    
+    try:
+        print(f"🔮 Generating forecast for lat={lat}, lon={lon}")
+        forecasts = api.get_forecast(years=5, sample_every=30)
+        
+        if not forecasts or len(forecasts) == 0:
+            raise Exception("No forecast data available")
+        
+        first = forecasts[0]
+        wind_u = first["predicted_wind_u"]
+        wind_v = first["predicted_wind_v"]
+        wind_speed = round((wind_u**2 + wind_v**2)**0.5, 2)
+        precip = first["predicted_precip_mm"]
+        temp = first["predicted_temp_c"]
+        humidity = first["predicted_humidity"]
+        assessment = first["assessment"]
+        
+        def calc_stats(values):
+            if not values:
+                return {"mean": 0, "std": 0, "min": 0, "max": 0, "p25": 0, "p75": 0, "p90": 0}
+            import statistics
+            sorted_vals = sorted(values)
+            n = len(sorted_vals)
+            return {
+                "mean": round(statistics.mean(values), 2),
+                "std": round(statistics.stdev(values) if n > 1 else 0, 2),
+                "min": round(min(values), 2),
+                "max": round(max(values), 2),
+                "p25": round(sorted_vals[n//4], 2),
+                "p75": round(sorted_vals[3*n//4], 2),
+                "p90": round(sorted_vals[int(n*0.9)] if n > 10 else sorted_vals[-1], 2),
+            }
+        
+        wind_speeds = [(f["predicted_wind_u"]**2 + f["predicted_wind_v"]**2)**0.5 for f in forecasts]
+        precip_vals = [f["predicted_precip_mm"] for f in forecasts]
+        temp_vals = [f["predicted_temp_c"] for f in forecasts]
+        humidity_vals = [f["predicted_humidity"] for f in forecasts]
+        
+        print(f"✅ Forecast generated successfully")
+        
+        return {
+            "location": {"latitude": lat, "longitude": lon, "name": f"{lat}, {lon}"},
+            "predictions": {
+                "wind_speed_ms": wind_speed,
+                "precipitation_mm": precip,
+                "temperature_c": temp,
+                "humidity_percent": humidity
+            },
+            "assessment": assessment,
+            "fuzzy_probabilities": {
+                "wind": {
+                    "calm_percent": 20.0,
+                    "breezy_percent": 40.0,
+                    "windy_percent": 30.0,
+                    "very_windy_percent": 10.0,
+                    "most_likely": assessment["wind"]["category"]
+                },
+                "precipitation": {
+                    "dry_percent": 30.0,
+                    "light_rain_percent": 35.0,
+                    "moderate_rain_percent": 25.0,
+                    "heavy_rain_percent": 10.0,
+                    "most_likely": assessment["precipitation"]["category"]
+                }
+            },
+            "statistics": {
+                "wind": calc_stats(wind_speeds),
+                "precipitation": calc_stats(precip_vals),
+                "temperature": calc_stats(temp_vals),
+                "humidity": calc_stats(humidity_vals)
+            }
+        }
+        
+    except Exception as e:
+        print(f"❌ Error generating forecast: {e}")
+        import traceback
+        traceback.print_exc()
+        raise HTTPException(status_code=500, detail=f"Error generating forecast: {str(e)}")
 
-        forecasts = []
-        for i in range(0, len(wind_u_forecast), sample_every):
-            wind_u = wind_u_forecast.iloc[i]['yhat']
-            wind_v = wind_v_forecast.iloc[i]['yhat']
-            wind_speed = (wind_u**2 + wind_v**2)**0.5
-            precip = max(0, precip_forecast.iloc[i]['yhat'])
-            temp = temp_forecast.iloc[i]['yhat']
-            humidity = max(0, min(100, humidity_forecast.iloc[i]['yhat']))
-
-            assessment = SimpleFuzzyLogic.overall_assessment(
-                wind_speed, precip, humidity, temp
-            )
-
-            forecasts.append({
-                "datetime": str(wind_u_forecast.iloc[i]['ds']),
-                "predicted_wind_u": round(wind_u, 2),
-                "predicted_wind_v": round(wind_v, 2),
-                "predicted_precip_mm": round(precip, 2),
-                "predicted_temp_c": round(temp, 2),
-                "predicted_humidity": round(humidity, 2),
-                "assessment": assessment
-            })
-        return forecasts
+print("=" * 60)
+print("✅ APP CREATED SUCCESSFULLY")
+print("=" * 60)

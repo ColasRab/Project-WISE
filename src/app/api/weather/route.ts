@@ -1,113 +1,170 @@
-// app/api/weather/route.ts
-import { type NextRequest, NextResponse } from "next/server"
+import { NextResponse } from 'next/server';
 
-export async function GET(request: NextRequest) {
+export async function GET(request: Request) {
   try {
-    const searchParams = request.nextUrl.searchParams
-    const lat = searchParams.get("lat")
-    const lon = searchParams.get("lon")
-    const time = searchParams.get("time")
+    // Get query parameters from the URL
+    const { searchParams } = new URL(request.url);
+    const lat = searchParams.get('lat');
+    const lon = searchParams.get('lon');
 
+    // Validate parameters
     if (!lat || !lon) {
-      return NextResponse.json({ error: "Missing latitude or longitude" }, { status: 400 })
+      return NextResponse.json(
+        { error: 'Missing required parameters: lat and lon' },
+        { status: 400 }
+      );
     }
 
-    // If specific time requested, we still need to fetch multiple hours
-    // because Prophet generates forecasts from now onwards
-    // We'll fetch 24 hours and filter for the requested time
-    const hoursToFetch = 24
-    const url = `https://project-wise.onrender.com/api/weather?lat=${lat}&lon=${lon}&hours=${hoursToFetch}`
+    // Validate lat/lon are numbers
+    const latitude = parseFloat(lat);
+    const longitude = parseFloat(lon);
 
-    console.log("Fetching from backend:", url)
-
-    const apiRes = await fetch(url, {
-      cache: "no-store",
-    })
-
-    if (!apiRes.ok) {
-      const errorText = await apiRes.text()
-      console.error("Backend API error:", apiRes.status, errorText)
-      throw new Error(`Backend API returned ${apiRes.status}`)
+    if (isNaN(latitude) || isNaN(longitude)) {
+      return NextResponse.json(
+        { error: 'Invalid coordinates: lat and lon must be numbers' },
+        { status: 400 }
+      );
     }
 
-    const data = await apiRes.json()
+    // Validate coordinate ranges
+    if (latitude < -90 || latitude > 90) {
+      return NextResponse.json(
+        { error: 'Invalid latitude: must be between -90 and 90' },
+        { status: 400 }
+      );
+    }
+
+    if (longitude < -180 || longitude > 180) {
+      return NextResponse.json(
+        { error: 'Invalid longitude: must be between -180 and 180' },
+        { status: 400 }
+      );
+    }
+
+    // Get the backend API URL from environment variable
+    const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:8000';
     
-    if (data.status === "error") {
-      throw new Error(data.message || "Backend returned error status")
-    }
+    console.log(`Fetching weather data from: ${BACKEND_URL}/api/weather?lat=${latitude}&lon=${longitude}`);
 
-    if (data.status === "loading") {
-      return NextResponse.json({
-        error: "Models are still loading. Please try again in a moment.",
-        status: "loading"
-      }, { status: 503 })
-    }
-
-    // If specific time requested, filter the forecast data
-    if (time && time !== "all" && data.forecast && Array.isArray(data.forecast)) {
-      const requestedHour = parseInt(time)
-      
-      // Find the forecast entry closest to the requested hour
-      const filteredForecasts = data.forecast.filter((entry: any) => {
-        const forecastDate = new Date(entry.datetime)
-        return forecastDate.getHours() === requestedHour
-      })
-
-      if (filteredForecasts.length > 0) {
-        // Return just the first matching forecast
-        const forecast = filteredForecasts[0]
-        
-        return NextResponse.json({
-          status: "success",
-          location: data.location,
-          predictions: {
-            wind_speed_ms: forecast.predicted_wind_u,
-            precipitation_mm: forecast.predicted_precip_mm,
-            temperature_c: forecast.predicted_temp_c,
-            humidity_percent: forecast.predicted_humidity,
-          },
-          assessment: forecast.assessment,
-          fuzzy_probabilities: {
-            wind: {
-              most_likely: forecast.assessment.wind.category,
-            },
-            precipitation: {
-              most_likely: forecast.assessment.precipitation.category,
-            },
-          },
-        })
+    // Call the Python backend API
+    const response = await fetch(
+      `${BACKEND_URL}/api/weather?lat=${latitude}&lon=${longitude}`,
+      {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        // Add timeout
+        signal: AbortSignal.timeout(30000), // 30 second timeout
       }
+    );
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error('Backend API error:', errorText);
+      return NextResponse.json(
+        { 
+          error: 'Failed to fetch weather data from backend',
+          details: errorText,
+          status: response.status
+        },
+        { status: response.status }
+      );
     }
 
-    // If "all" time or no specific match, return all forecasts formatted
-    if (data.forecast && Array.isArray(data.forecast)) {
-      return NextResponse.json({
-        status: "success",
-        location: data.location,
-        forecasts: data.forecast.map((entry: any) => ({
-          datetime: entry.datetime,
-          predictions: {
-            wind_speed_ms: Math.sqrt(
-              Math.pow(entry.predicted_wind_u, 2) + Math.pow(entry.predicted_wind_v, 2)
-            ),
-            precipitation_mm: entry.predicted_precip_mm,
-            temperature_c: entry.predicted_temp_c,
-            humidity_percent: entry.predicted_humidity,
-          },
-          assessment: entry.assessment,
-        })),
-      })
-    }
+    const data = await response.json();
+    
+    // Return the data from the backend
+    return NextResponse.json(data);
 
-    return NextResponse.json(data)
   } catch (error) {
-    console.error("Error fetching weather data:", error)
+    console.error('Error in weather API route:', error);
+    
+    // Handle different error types
+    if (typeof error === 'object' && error !== null && 'name' in error && (error as any).name === 'AbortError') {
+      return NextResponse.json(
+        { error: 'Request timeout: Backend server took too long to respond' },
+        { status: 504 }
+      );
+    }
+
+    if (
+      typeof error === 'object' &&
+      error !== null &&
+      'cause' in error &&
+      (error as any).cause?.code === 'ECONNREFUSED'
+    ) {
+      return NextResponse.json(
+        { error: 'Backend server is not reachable. Please check if the Python service is running.' },
+        { status: 503 }
+      );
+    }
+
     return NextResponse.json(
       { 
-        error: error instanceof Error ? error.message : "Failed to fetch weather data",
-        details: error instanceof Error ? error.stack : undefined
-      }, 
+        error: 'Internal server error',
+        message: typeof error === 'object' && error !== null && 'message' in error ? (error as any).message : String(error)
+      },
       { status: 500 }
-    )
+    );
+  }
+}
+
+// Optional: Add POST method if needed
+export async function POST(request: { json: () => any; }) {
+  try {
+    const body = await request.json();
+    const { lat, lon } = body;
+
+    if (!lat || !lon) {
+      return NextResponse.json(
+        { error: 'Missing required parameters: lat and lon' },
+        { status: 400 }
+      );
+    }
+
+    const latitude = parseFloat(lat);
+    const longitude = parseFloat(lon);
+
+    if (isNaN(latitude) || isNaN(longitude)) {
+      return NextResponse.json(
+        { error: 'Invalid coordinates: lat and lon must be numbers' },
+        { status: 400 }
+      );
+    }
+
+    const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:8000';
+    
+    const response = await fetch(
+      `${BACKEND_URL}/api/weather?lat=${latitude}&lon=${longitude}`,
+      {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        signal: AbortSignal.timeout(30000),
+      }
+    );
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      return NextResponse.json(
+        { error: 'Failed to fetch weather data', details: errorText },
+        { status: response.status }
+      );
+    }
+
+    const data = await response.json();
+    return NextResponse.json(data);
+
+  } catch (error) {
+    console.error('Error in weather API POST route:', error);
+    return NextResponse.json(
+      { 
+        error: 'Internal server error', 
+        message: typeof error === 'object' && error !== null && 'message' in error ? (error as any).message : String(error)
+      },
+      { status: 500 }
+    );
   }
 }
