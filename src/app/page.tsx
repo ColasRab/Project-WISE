@@ -6,10 +6,9 @@ import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
 import { Calendar } from "@/components/ui/calendar"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
-import { CalendarIcon, Download, Loader2, Sparkles } from "lucide-react"
+import { CalendarIcon, Download, Loader2, Sparkles, MapPin } from "lucide-react"
 import { format } from "date-fns"
 import WeatherRiskCards from "@/components/weather-risk-cards"
-import WeatherChart from "@/components/weather-chart"
 import { LocationAutocomplete, PhilippineLocation } from "@/components/location-autocomplete"
 import { AnimatedWeatherIcon } from "@/components/animated-weather-icon"
 import { TimePicker } from "@/components/time-picker"
@@ -20,22 +19,17 @@ interface LocationForecast {
     latitude: number
     longitude: number
     name: string
+    city?: string
   }
   datetime?: string
   hour?: number
+  city?: string
   predictions: {
     wind_speed_ms: number
     precipitation_mm: number
     temperature_c: number
     humidity_percent: number
-  }
-  fuzzy_probabilities?: {
-    wind: {
-      most_likely: string
-    }
-    precipitation: {
-      most_likely: string
-    }
+    chance_of_rain?: number
   }
   assessment: {
     wind: {
@@ -69,15 +63,18 @@ interface MultipleForecast {
     latitude: number
     longitude: number
     name: string
+    city?: string
   }
   forecasts: Array<{
     datetime: string
     hour: number
+    city?: string
     predictions: {
       wind_speed_ms: number
       precipitation_mm: number
       temperature_c: number
       humidity_percent: number
+      chance_of_rain?: number
     }
     assessment: any
   }>
@@ -104,6 +101,7 @@ export default function WeatherDashboard() {
         body: JSON.stringify({
           lat: selectedLocation.lat,
           lon: selectedLocation.lon,
+          city: selectedLocation.name, // Pass city name to backend
           target_date: dateStr,
           target_hour: time,
         }),
@@ -165,6 +163,14 @@ export default function WeatherDashboard() {
     return data && 'forecasts' in data
   }
 
+  const getDisplayCity = () => {
+    if (!weatherData) return ""
+    if (isMultipleForecast(weatherData)) {
+      return weatherData.forecasts[0]?.city || weatherData.location.city || weatherData.location.name
+    }
+    return weatherData.city || weatherData.location.city || weatherData.location.name
+  }
+
   return (
     <main className="min-h-screen bg-gradient-to-br from-background via-background to-accent/5 p-6 md:p-12">
       <div className="max-w-7xl mx-auto space-y-8">
@@ -182,7 +188,7 @@ export default function WeatherDashboard() {
             <Sparkles className="h-6 w-6 text-amber-500 animate-pulse" />
           </div>
           <p className="text-muted-foreground text-lg">
-            Plan your outdoor activities in the Philippines with confidence using NASA Earth observation data
+            Plan your outdoor activities in the Philippines with confidence using city-based weather models
           </p>
         </motion.div>
 
@@ -274,8 +280,9 @@ export default function WeatherDashboard() {
                     <AnimatedWeatherIcon type="cloud" className="h-6 w-6 text-primary" />
                     Weather Insights
                   </h2>
-                  <p className="text-muted-foreground">
-                    {weatherData.location.name} •{" "}
+                  <p className="text-muted-foreground flex items-center gap-2">
+                    <MapPin className="h-4 w-4" />
+                    {weatherData.location.name} • {getDisplayCity()} •{" "}
                     {date ? format(date, "MMMM d, yyyy") : ""} •{" "}
                     {time === "all" ? "All Day (Every 3 hours)" : `${time.padStart(2, "0")}:00`}
                   </p>
@@ -296,13 +303,35 @@ export default function WeatherDashboard() {
                     <div key={index} className="space-y-4">
                       <h3 className="text-xl font-semibold flex items-center gap-2">
                         <span className="text-primary">{hourData.hour.toString().padStart(2, "0")}:00</span>
+                        {hourData.predictions.chance_of_rain !== undefined && (
+                          <span className="text-sm text-muted-foreground">
+                            • {hourData.predictions.chance_of_rain.toFixed(0)}% chance of rain
+                          </span>
+                        )}
                       </h3>
                       <WeatherRiskCards data={hourData} />
                     </div>
                   ))}
                 </div>
               ) : (
-                <WeatherRiskCards data={weatherData} />
+                <>
+                  {weatherData.predictions.chance_of_rain !== undefined && (
+                    <Card className="border-blue-500/20 bg-blue-500/5">
+                      <CardContent className="pt-6">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-3">
+                            <AnimatedWeatherIcon type="rain" className="h-8 w-8 text-blue-500" />
+                            <div>
+                              <p className="text-sm text-muted-foreground">Chance of Rain</p>
+                              <p className="text-3xl font-bold">{weatherData.predictions.chance_of_rain.toFixed(0)}%</p>
+                            </div>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  )}
+                  <WeatherRiskCards data={weatherData} />
+                </>
               )}
             </motion.div>
           )}

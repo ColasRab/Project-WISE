@@ -12,6 +12,20 @@ const getSeverityColor = (severity: number) => {
   return { label: "High Risk", color: "bg-red-500/20 text-red-400 border-red-500/30" }
 }
 
+const getRainSeverity = (chanceOfRain: number) => {
+  if (chanceOfRain < 30) return 0.0  // Low chance
+  if (chanceOfRain < 60) return 0.3  // Medium chance
+  if (chanceOfRain < 80) return 0.6  // High chance
+  return 0.9  // Very high chance
+}
+
+const getRainCategory = (chanceOfRain: number) => {
+  if (chanceOfRain < 30) return "Low Chance"
+  if (chanceOfRain < 60) return "Possible"
+  if (chanceOfRain < 80) return "Likely"
+  return "Very Likely"
+}
+
 const cardBackgrounds = {
   wind: "bg-gradient-to-br from-cyan-500/5 via-cyan-400/5 to-blue-500/5 relative overflow-hidden before:absolute before:inset-0 before:bg-[radial-gradient(circle_at_50%_120%,rgba(6,182,212,0.1),transparent)] before:animate-pulse",
   rain: "bg-gradient-to-br from-indigo-500/5 via-blue-400/5 to-indigo-600/5 relative overflow-hidden before:absolute before:inset-0 before:bg-[linear-gradient(45deg,transparent_25%,rgba(99,102,241,0.05)_25%,rgba(99,102,241,0.05)_50%,transparent_50%,transparent_75%,rgba(99,102,241,0.05)_75%)] before:bg-[length:20px_20px]",
@@ -53,6 +67,11 @@ export default function WeatherRiskCards({ data }: { data: any }) {
       </div>
     )
   }
+
+  // Calculate rain severity from chance_of_rain
+  const chanceOfRain = predictions.chance_of_rain || 0
+  const rainSeverity = getRainSeverity(chanceOfRain)
+  const rainCategory = getRainCategory(chanceOfRain)
 
   return (
     <motion.div className="space-y-6" variants={containerVariants} initial="hidden" animate="visible">
@@ -130,13 +149,13 @@ export default function WeatherRiskCards({ data }: { data: any }) {
           </Card>
         </motion.div>
 
-        {/* Precipitation */}
+        {/* Chance of Rain */}
         <motion.div variants={cardVariants}>
           <Card
             className={`border-indigo-500/20 hover:border-indigo-500/40 hover:shadow-lg transition-all duration-300 group ${cardBackgrounds.rain}`}
           >
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 relative z-10">
-              <CardTitle className="text-sm font-medium">Precipitation</CardTitle>
+              <CardTitle className="text-sm font-medium">Chance of Rain</CardTitle>
               <AnimatedWeatherIcon
                 type="rain"
                 className="h-5 w-5 text-indigo-500 group-hover:scale-110 transition-transform"
@@ -150,14 +169,14 @@ export default function WeatherRiskCards({ data }: { data: any }) {
                   animate={{ scale: 1 }}
                   transition={{ type: "spring", stiffness: 200, delay: 0.3 }}
                 >
-                  {assessment.precipitation?.category || "Unknown"}
+                  {rainCategory}
                 </motion.div>
                 <p className="text-xs text-muted-foreground mt-1">
-                  {(predictions.precipitation_mm || 0).toFixed(2)} mm
+                  {chanceOfRain.toFixed(0)}% probability
                 </p>
               </div>
-              <Badge variant="outline" className={getSeverityColor(assessment.precipitation?.severity || 0).color}>
-                {getSeverityColor(assessment.precipitation?.severity || 0).label}
+              <Badge variant="outline" className={getSeverityColor(rainSeverity).color}>
+                {getSeverityColor(rainSeverity).label}
               </Badge>
             </CardContent>
           </Card>

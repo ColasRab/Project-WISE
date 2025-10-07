@@ -1,83 +1,85 @@
-import os
 import pandas as pd
 import joblib
 from prophet import Prophet
+from tqdm import tqdm
+import os
+import numpy as np
 
-# Base directory where this script is located
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+DATA_DIR = "python\\data\\raw"
+OUTPUT_DIR = "models"
+os.makedirs(OUTPUT_DIR, exist_ok=True)
 
-# Data and models directories relative to this script
-DATA_DIR = os.path.join(BASE_DIR, "data", "processed")
-MODEL_DIR = os.path.join(BASE_DIR, "models")
+def derive_chance_of_rain_vectorized(df):
+    """Vectorized version of chance_of_rain calculation (no memory overflow)."""
+    et0 = df["et0_fao_evapotranspiration"].fillna(0)
+    temp = df["temperature_2m"].fillna(0)
+    rh = df["relative_humidity_2m"].fillna(0)
 
-os.makedirs(MODEL_DIR, exist_ok=True)
+    rain_score = (rh * 0.6) + (np.maximum(0, 40 - temp) * 0.3) + (np.maximum(0, 5 - et0) * 2)
+    return np.clip(rain_score, 0, 100)
 
-def train_and_save(csv_file, value_col="value", day_col="day", hour_col="hour", model_name="model"):
-    """Train a Prophet model from CSV and save to models/ (with unit normalization)."""
-    path = os.path.join(DATA_DIR, csv_file)
-    if not os.path.exists(path):
-        raise FileNotFoundError(f"❌ Training data missing: {path}")
+def train_per_city(hourly_csv, cities_csv):
+    hourly_path = os.path.join(DATA_DIR, hourly_csv)
+    cities_path = os.path.join(DATA_DIR, cities_csv)
 
-    df = pd.read_csv(path)
-    print(f"📂 Loaded {csv_file}: {len(df)} rows")
+    df = pd.read_csv(hourly_path)
+    cities = pd.read_csv(cities_path)
 
-    # Drop duplicate timestamps (common in reanalysis data)
-    if {"day", "hour"}.issubset(df.columns):
-        df = df.drop_duplicates(subset=["day", "hour"])
-        print(f"🧹 After deduplication: {len(df)} rows")
+    df["city_name"] = df["city_name"].str.strip().str.lower()
+    cities["city_name"] = cities["city_name"].str.strip().str.lower()
 
-    # =========================
-    # UNIT NORMALIZATION
-    # =========================
-    if "temperature" in csv_file.lower():
-        df[value_col] = df[value_col] - 273.15  # Kelvin → Celsius
-        print("🌡️ Converted temperature from K → °C")
+    df = df.merge(cities, on="city_name", how="left")
 
-    if "humidity" in csv_file.lower() and df[value_col].max() <= 1:
-        df[value_col] = df[value_col] * 100  # fraction → percent
-        print("💧 Converted humidity from fraction → %")
+    # 🚀 Vectorized rain percentage (fast + memory-safe)
+    print("🌧️ Deriving chance_of_rain...")
+    df["chance_of_rain"] = derive_chance_of_rain_vectorized(df)
 
-    if "precip" in csv_file.lower():
-        df[value_col] = df[value_col] * 3600  # kg/m²/s → mm/hour
-        print("🌧️ Converted precipitation from kg/m²/s → mm/hour")
+    df["datetime"] = pd.to_datetime(df["datetime"])
+    df.sort_values(["city_name", "datetime"], inplace=True)
 
-    # =========================
-    # TIMESTAMP HANDLING
-    # =========================
-    if {day_col, hour_col, value_col}.issubset(df.columns):
-        df["ds"] = pd.to_datetime(df[day_col].astype(str) + " " + df[hour_col].astype(str) + ":00:00")
-        df = df.rename(columns={value_col: "y"})
-    elif {"ds", "y"}.issubset(df.columns):
-        pass  # already formatted
-    else:
-        raise ValueError(f"CSV {csv_file} must have either (day,hour,value) or (ds,y) columns")
+    target_vars = [
+        "chance_of_rain",
+        "wind_speed_10m",
+        "apparent_temperature",
+        "relative_humidity_2m",
+    ]
 
-    df = df[["ds", "y"]].dropna()
-    if df["y"].nunique() < 3:
-        raise ValueError(f"⚠️ Not enough variation in {csv_file} for Prophet training")
+    city_names = df["city_name"].unique()
+    print(f"📊 Found {len(city_names)} cities to train Prophet models for.\n")
 
-    # =========================
-    # TRAIN PROPHET MODEL
-    # =========================
-    print(f"📊 Training Prophet model for {model_name} ({len(df)} hourly records)...")
-    model = Prophet(
-        daily_seasonality=True,
-        weekly_seasonality=True,
-        yearly_seasonality=True
-    )
-    model.fit(df)
+    for city in tqdm(city_names, desc="Training per city"):
+        city_df = df[df["city_name"] == city].copy()
+        if city_df.empty:
+            print(f"⚠️ Skipping {city} (no data)")
+            continue
 
-    # =========================
-    # SAVE MODEL
-    # =========================
-    out_path = os.path.join(MODEL_DIR, f"{model_name}.pkl")
-    joblib.dump(model, out_path)
-    print(f"✅ Saved trained model → {out_path}\n")
+        for target in target_vars:
+            model_df = city_df[["datetime", target]].rename(columns={"datetime": "ds", target: "y"})
+            regressors = [v for v in target_vars if v != target]
+
+            for reg in regressors:
+                if reg in city_df.columns:
+                    model_df[reg] = city_df[reg]
+
+            model = Prophet(
+                daily_seasonality=True,
+                weekly_seasonality=True,
+                yearly_seasonality=True,
+                seasonality_mode="additive"
+            )
+
+            for reg in regressors:
+                model.add_regressor(reg)
+
+            try:
+                model.fit(model_df)
+                model_path = os.path.join(OUTPUT_DIR, f"{city}_{target}_prophet.pkl")
+                joblib.dump(model, model_path)
+                print(f"✅ Saved {city.title()} → {target} model")
+            except Exception as e:
+                print(f"❌ Skipping {city} {target}: {e}")
+
+    print("\n🎯 All Prophet models trained and saved successfully.")
+
 if __name__ == "__main__":
-    train_and_save("wind_u.csv", model_name="wind_u")
-    train_and_save("wind_v.csv", model_name="wind_v")
-    train_and_save("precipitation.csv", model_name="precip")
-    train_and_save("temperature.csv", model_name="temp")
-    train_and_save("humidity.csv", model_name="humidity")
-
-    print("🎉 All models trained and saved in:", MODEL_DIR)
+    train_per_city("hourly_data_combined_2020_to_2023.csv", "cities.csv")

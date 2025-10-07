@@ -1,0 +1,863 @@
+location,city,province,lat,lon,type
+Philippines,Philippines,,12.7503486,122.7312101,municipality
+Quezon City,Quezon City,,14.6510546,121.0486254,city
+Legazpi,Legazpi,,13.1388505,123.7345746,city
+"Washington, Albay",Washington,Albay,13.1026983,123.6987233,city_block
+Angeles,Angeles,,15.1389351,120.5875321,city
+Olongapo,Olongapo,,14.8388848,120.2843587,city
+Urdaneta,Urdaneta,,15.9759995,120.5668992,city
+Tarlac City,Tarlac City,,15.4861218,120.5893473,city
+Antipolo,Antipolo,,14.5871972,121.1759246,city
+Naga,Naga,,10.2084724,123.7590963,city
+Tuguegarao,Tuguegarao,,17.6118858,121.7300377,city
+Catbalogan,Catbalogan,,11.7753199,124.8829549,city
+Cabuyao,Cabuyao,,14.2795538,121.1235712,city
+Baliwag,Baliwag,,14.9542259,120.9009172,city
+Vigan,Vigan,,17.5755487,120.3872632,city
+Imus,Imus,,14.4290041,120.9365856,city
+"Bislig, Surigao del Sur",Bislig,Surigao del Sur,8.2130815,126.3156173,city
+Guihulngan,Guihulngan,,10.1195972,123.273871,city
+Ilagan,Ilagan,,17.1486341,121.8886466,city
+Manila,Manila,,14.5904492,120.9803621,city
+Passi,Passi,,11.1173503,122.6468706,city
+Ligao,Ligao,,13.2402789,123.5365227,city
+Meycauayan,Meycauayan,,14.7345008,120.9571635,city
+Cabanatuan,Cabanatuan,,15.4905045,120.9684264,city
+Muñoz,Muñoz,,15.7135413,120.9039451,city
+Gapan,Gapan,,15.3122806,120.9479433,city
+Tayabas,Tayabas,,14.0263471,121.5918364,city
+General Trias,General Trias,,14.3861207,120.8802855,city
+Parañaque,Parañaque,,14.5008116,120.9915327,city
+Taguig,Taguig,,14.5270538,121.0744942,city
+Dasmariñas,Dasmariñas,,14.3270819,120.9370871,city
+Mandaluyong,Mandaluyong,,14.5774392,121.0338973,city
+Bayugan,Bayugan,,8.7145642,125.7481892,city
+Bacoor,Bacoor,,14.4596033,120.9598169,city
+San Juan,San Juan,,14.6044363,121.0299469,city
+Santa Rosa,Santa Rosa,,14.3146042,121.1137004,city
+"Malaybalay, Bukidnon",Malaybalay,Bukidnon,8.1550421,125.1305726,city
+Carmona,Carmona,,14.3134594,121.0574345,city
+"Tanjay, Negros Oriental",Tanjay,Negros Oriental,9.5164507,123.1566353,city
+Koronadal,Koronadal,,6.5004041,124.8435437,city
+Maasin,Maasin,,10.1325061,124.8385147,city
+Kabankalan,Kabankalan,,9.9889153,122.8134802,city
+"Mati, Davao Oriental",Mati,Davao Oriental,6.9521657,126.2166758,city
+Malabon,Malabon,,14.6578504,120.9511261,city
+Victorias,Victorias,,10.9013412,123.0714943,city
+Calapan,Calapan,,13.4145513,121.179543,city
+Tacurong,Tacurong,,6.6884368,124.6786576,city
+Santo Tomas,Santo Tomas,,14.1078443,121.1453304,city
+"Kidapawan, North Cotabato",Kidapawan,North Cotabato,7.0095784,125.0905037,city
+El Salvador,El Salvador,,8.5585108,124.5264381,city
+Batac,Batac,,18.0555035,120.5645243,city
+Sipalay,Sipalay,,9.7491266,122.4040602,city
+Borongan,Borongan,,11.6079854,125.4322433,city
+Sagay,Sagay,,10.8960681,123.4154617,city
+Las Piñas,Las Piñas,,14.4809012,120.9817861,city
+Masbate City,Masbate City,,12.3710899,123.6239223,city
+Balanga,Balanga,,14.6795669,120.5409693,city
+Marikina,Marikina,,14.6331084,121.0993541,city
+Calamba,Calamba,,14.2060217,121.1556496,city
+Tandag,Tandag,,9.0799833,126.1974606,city
+Navotas,Navotas,,14.6571862,120.9479692,city
+Tanauan,Tanauan,,14.0852359,121.1527927,city
+Santiago,Santiago,,16.6915963,121.5478637,city
+Escalante,Escalante,,10.8412587,123.499306,city
+Calaca,Calaca,,13.9338465,120.8140254,city
+"Samal, Davao del Norte",Samal,Davao del Norte,7.0780265,125.7120437,city
+"Isabela, Basilan",Isabela,Basilan,6.7053597,121.9710604,city
+Muntinlupa,Muntinlupa,,14.3892634,121.0449101,city
+Candon,Candon,,17.1929894,120.4483993,city
+San Jose del Monte,San Jose del Monte,,14.8101978,121.0474088,city
+San Fernando,San Fernando,,15.0283014,120.6938038,city
+"Lamitan, Basilan",Lamitan,Basilan,6.6575615,122.1449694,city
+Alaminos,Alaminos,,16.1553857,119.9792201,city
+Himamaylan,Himamaylan,,10.0992841,122.870539,city
+"Tabuk, Kalinga",Tabuk,Kalinga,17.4136195,121.4440137,city
+Biñan,Biñan,,14.3388259,121.0841826,city
+Bayawan,Bayawan,,9.3661533,122.804837,city
+Sorsogon City,Sorsogon City,,12.9707848,124.0052543,city
+"Cotabato City, Maguindanao del Norte",Cotabato City,Maguindanao del Norte,7.2237628,124.2467062,city
+Tagbilaran,Tagbilaran,,9.6402611,123.8559809,city
+Dioquino Zobel,Dioquino Zobel,,14.6195201,121.0648214,city_block
+Merry Homes,Merry Homes,,14.7038976,121.056125,city_block
+NHC-Tala Estate Subdivision,NHC-Tala Estate Subdivision,,14.772601,121.069328,city_block
+Rosanno Ville,Rosanno Ville,,14.674981,121.036651,city_block
+Barracks,Barracks,,14.56878,121.077766,city_block
+Santa Rita Village,Santa Rita Village,,14.6687815,121.0294288,city_block
+Josefina Compound 2,Josefina Compound 2,,14.4649109,120.9714822,city_block
+Ruby Ville,Ruby Ville,,14.67762,121.004287,city_block
+Jem 2 Homes,Jem 2 Homes,,14.679711,121.047317,city_block
+Philand Village,Philand Village,,14.6757357,121.0493694,city_block
+Amparo Capri Subdivision,Amparo Capri Subdivision,,14.719571,121.02716,city_block
+Ramos Compound,Ramos Compound,,14.679563,121.05088,city_block
+Trece Martires,Trece Martires,,14.2811668,120.8702367,city
+Gonzales Compound,Gonzales Compound,,14.4369284,121.0099438,city_block
+PHHC-Camarin Subdivision Area C,PHHC-Camarin Subdivision Area C,,14.7627333,121.0515159,city_block
+Blueville,Blueville,,14.72957,121.0374229,city_block
+Villa Veronica,Villa Veronica,,14.7094409,121.0476003,city_block
+Bayanihan Village,Bayanihan Village,,14.6682715,121.0247138,city_block
+Coronado Bliss Housing Project,Coronado Bliss Housing Project,,14.571261,121.032241,city_block
+Pasay,Pasay,,14.5436995,120.9946503,city
+Sunvalley,Sunvalley,,14.51127,121.004829,city_block
+Malinta Village,Malinta Village,,14.68693,120.965858,city_block
+Valenzuela,Valenzuela,,14.6916903,120.9694534,city
+Happy Homeland Homes 2,Happy Homeland Homes 2,,14.7059969,121.05417,city_block
+Saint Dominic 6,Saint Dominic 6,,14.6760506,121.0478229,city_block
+Baltao Subdivision,Baltao Subdivision,,14.5084121,121.006433,city_block
+Carolyn Park,Carolyn Park,,14.668451,121.007362,city_block
+Brookside Hills,Brookside Hills,,14.5889196,121.1234512,city_block
+Javier Compound,Javier Compound,,14.5687909,121.136131,city_block
+Vasquez Compound,Vasquez Compound,,14.708781,121.044281,city_block
+Buenamar,Buenamar,,14.720171,121.038757,city_block
+Cavite City,Cavite City,,14.4820919,120.908919,city
+Makati,Makati,,14.5567949,121.0211226,city
+"Javier Compound, Rizal",Javier Compound,Rizal,14.572196,121.1349705,city_block
+Rosalia Village 2,Rosalia Village 2,,14.67911,121.037651,city_block
+Don Carlos Village,Don Carlos Village,,14.5316498,121.0004049,city_block
+Don Mariano Home Settlement,Don Mariano Home Settlement,,14.68648,121.096931,city_block
+Natividad,Natividad,,14.7075497,121.0502403,city_block
+Alta Vista Homes,Alta Vista Homes,,14.678464,121.0057739,city_block
+Barcelona Compound,Barcelona Compound,,14.6692657,121.0285786,city_block
+San Gregorio Village,San Gregorio Village,,14.53109,121.001617,city_block
+Ina Executive Homes II,Ina Executive Homes II,,14.48389,121.015007,city_block
+Doña Rosario Heights,Doña Rosario Heights,,14.71832,121.037498,city_block
+Felo 1,Felo 1,,14.6987525,120.9591297,city_block
+Tierra Gloria,Tierra Gloria,,14.67849,121.054611,city_block
+San Miguel Compound,San Miguel Compound,,14.68073,121.044357,city_block
+Sanville,Sanville,,14.670311,121.048431,city_block
+San Pedro,San Pedro,,14.3639435,121.056771,city
+Bayanihan,Bayanihan,,14.6147007,121.06912,city_block
+Cebu City,Cebu City,,10.2934946,123.9018183,city
+San Pablo,San Pablo,,14.0700502,121.3255974,city
+Lucena,Lucena,,13.9357696,121.6128612,city
+Lipa,Lipa,,13.941434,121.1642826,city
+Tacloban,Tacloban,,11.2436208,125.0079543,city
+Puerto Princesa,Puerto Princesa,,9.7398561,118.7438187,city
+Ormoc,Ormoc,,11.0052935,124.6090753,city
+Toledo,Toledo,,10.3749385,123.6344069,city
+Cagayan de Oro,Cagayan de Oro,,8.4756417,124.6421532,city
+Tagaytay,Tagaytay,,14.0992606,120.9391818,city
+Dagupan,Dagupan,,16.043021,120.3337627,city
+Laoag,Laoag,,18.1973235,120.5935433,city
+"Valencia, Bukidnon",Valencia,Bukidnon,7.9028844,125.0898033,city
+"Surigao City, Surigao del Norte",Surigao City,Surigao del Norte,9.7905028,125.4935697,city
+Barangay 105,Barangay 105,,14.6479653,120.9928844,city_block
+Barangay 103,Barangay 103,,14.6492413,120.9903154,city_block
+Barangay 98,Barangay 98,,14.6521582,120.9945026,city_block
+Barangay 66,Barangay 66,,14.6519596,120.9786475,city_block
+Barangay 62,Barangay 62,,14.6507213,120.9822293,city_block
+"Davao City, Davao del Sur",Davao City,Davao del Sur,7.0648306,125.6080623,city
+"Danao, Cebu",Danao,Cebu,10.5194879,124.0271297,city
+"Talisay, Cebu",Talisay,Cebu,10.2430205,123.8488245,city
+"Carcar, Cebu",Carcar,Cebu,10.1055552,123.6406685,city
+"Panabo, Davao del Norte",Panabo,Davao del Norte,7.29987,125.6807086,city
+"Tagum, Davao del Norte",Tagum,Davao del Norte,7.4470784,125.8094853,city
+Bago,Bago,,10.5376299,122.8352802,city
+San Jose,San Jose,,15.7917408,120.989145,city
+Mandaue,Mandaue,,10.3269049,123.9427295,city
+Lapu-Lapu,Lapu-Lapu,,10.3126722,123.9488177,city
+GK USTMed 63,GK USTMed 63,,14.8421779,121.0943849,city_block
+GK USTMed 79,GK USTMed 79,,14.8435657,121.0932641,city_block
+GK USTMed 77,GK USTMed 77,,14.8435907,121.0934588,city_block
+GK Xavier Class 68,GK Xavier Class 68,,14.8419605,121.0925677,city_block
+GK BMW-M3 English,GK BMW-M3 English,,14.83643,121.085097,city_block
+GK Barrio Paraiso,GK Barrio Paraiso,,14.8436791,121.0936989,city_block
+GK SW Florida Vita Mary James,GK SW Florida Vita Mary James,,14.835878,121.084574,city_block
+GK Save A Heart,GK Save A Heart,,14.8367563,121.0913854,city_block
+GK USTMed 58,GK USTMed 58,,14.8446378,121.0935355,city_block
+GK Thomasian Village,GK Thomasian Village,,14.8377461,121.089475,city_block
+GK Japan 2,GK Japan 2,,14.8382414,121.089377,city_block
+GK Tau Mu,GK Tau Mu,,14.8369679,121.0917741,city_block
+GK USTMed 73,GK USTMed 73,,14.843634,121.0939285,city_block
+GK USTMed 74,GK USTMed 74,,14.8434781,121.0941722,city_block
+GK Banaria Hills,GK Banaria Hills,,14.8381879,121.0907479,city_block
+GK Agos Village,GK Agos Village,,14.836276,121.082878,city_block
+GK Asperilla,GK Asperilla,,14.8380442,121.0885887,city_block
+Caloocan,Caloocan,,14.651348,120.9724002,city
+Escopa IV,Escopa IV,,14.6255354,121.0741217,city_block
+Escopa II,Escopa II,,14.6243193,121.0742259,city_block
+Escopa I,Escopa I,,14.6242377,121.0735339,city_block
+Dumaguete,Dumaguete,,9.3054777,123.3080446,city
+Bacolod,Bacolod,,10.6762836,122.9513786,city
+Purok 5,Purok 5,,8.6605055,123.6022894,city_block
+Purok 3,Purok 3,,8.6190941,123.7113869,city_block
+Purok 6,Purok 6,,7.8462107,123.2498619,city_block
+"Digos, Davao del Sur",Digos,Davao del Sur,6.7440957,125.3555319,city
+La Carlota,La Carlota,,10.4268649,122.9208074,city
+Malolos,Malolos,,14.843759,120.8113694,city
+Batangas City,Batangas City,,13.7558718,121.0584755,city
+Silay,Silay,,10.7994126,122.9756149,city
+Pasig,Pasig,,14.5605166,121.0764343,city
+Palayan,Palayan,,15.5408666,121.0842988,city
+San Carlos,San Carlos,,10.486048,123.4190385,city
+Dipolog,Dipolog,,8.5864062,123.3449371,city
+Dapitan,Dapitan,,8.6549449,123.4243754,city
+Pagadian,Pagadian,,7.8249717,123.4365816,city
+Zamboanga City,Zamboanga City,,6.9046876,122.0764868,city
+"Ozamiz, Misamis Occidental",Ozamiz,Misamis Occidental,8.1470175,123.8459793,city
+Roxas,Roxas,,11.5895171,122.7500577,city
+Marawi,Marawi,,8.0047262,124.2854351,city
+Oroquieta,Oroquieta,,8.4858864,123.8077767,city
+Butuan,Butuan,,8.9474561,125.5431973,city
+Talisay,Talisay,,7.7417843,123.4694597,city_block
+Cosme Compound,Cosme Compound,,14.2909104,121.4588741,city_block
+Jetlane Village,Jetlane Village,,14.5099224,121.0068643,city_block
+Doña Candida Compound,Doña Candida Compound,,14.6814488,121.0113144,city_block
+Pingki-an 2,Pingki-an 2,,14.6804788,121.0585421,city_block
+Pingki-an 1,Pingki-an 1,,14.6810016,121.0552277,city_block
+Baguio,Baguio,,16.4119905,120.5933719,city
+Canlaon,Canlaon,,10.386953,123.2186238,city
+Cadiz,Cadiz,,10.956652,123.3057034,city
+De Borja,De Borja,,14.5420105,121.0708664,city_block
+Villa Petra Park Homes,Villa Petra Park Homes,,14.4658397,120.9896795,city_block
+Block 4,Block 4,,14.592202,120.9610216,city_block
+Block 5,Block 5,,14.8084714,121.0202317,city_block
+Block 6,Block 6,,14.8079122,121.0216818,city_block
+Block 7,Block 7,,14.80761,121.0200104,city_block
+Block 8,Block 8,,14.808135,121.0215572,city_block
+Block 9,Block 9,,16.4328565,120.5848861,city_block
+Iloilo City,Iloilo City,,10.6932884,122.5732604,city
+Phase 1,Phase 1,,7.1099008,125.5928151,city_block
+Phase 2,Phase 2,,7.113053,125.5968348,city_block
+Luna Compound,Luna Compound,,14.5479092,121.0764268,city_block
+Sabang,Sabang,,14.2571066,121.820414,city_block
+Phase 2B,Phase 2B,,7.1117858,125.5954905,city_block
+Phase 4,Phase 4,,7.1132026,125.5941086,city_block
+Phase 3,Phase 3,,7.1095944,125.5912737,city_block
+Bais,Bais,,9.5914852,123.1213875,city
+"Baybay, Leyte",Baybay,Leyte,10.6778023,124.7977531,city
+Boruya,Boruya,,13.3929,121.1205,city_block
+Calbayog,Calbayog,,12.0669758,124.5946412,city
+Bogo,Bogo,,11.0512735,124.0035064,city
+Social Development Complex,Social Development Complex,,14.6416892,121.077966,city_block
+Villa Grande Homes Phase 4,Villa Grande Homes Phase 4,,13.6163007,123.2248174,city_block
+Santa Margarita,Santa Margarita,,10.3730282,124.7494029,city_block
+Marangog,Marangog,,10.3739411,124.7491048,city_block
+Tablon,Tablon,,14.5998948,121.3443857,city_block
+Silangan,Silangan,,14.8320892,120.6012956,city_block
+Sumulong,Sumulong,,14.6209767,121.1831505,city_block
+"Gingoog, Misamis Oriental",Gingoog,Misamis Oriental,8.8232748,125.1012978,city
+Georgetown Heights Phase 2 & 3,Georgetown Heights Phase 2 & 3,,14.3732553,120.9858439,city_block
+Landheights Subdivision Phase II,Landheights Subdivision Phase II,,10.6860152,122.5197275,city_block
+Landheights Subdivision Phase I,Landheights Subdivision Phase I,,10.6854664,122.5223392,city_block
+Villa Carolina,Villa Carolina,,10.6842939,122.519925,city_block
+J. J. Carlos Pag-ibig Subdivision,J. J. Carlos Pag-ibig Subdivision,,14.6548404,121.1157773,city_block
+Iriga,Iriga,,13.4222626,123.4129406,city
+Centro,Centro,,15.4366027,119.9199249,city_block
+Kanluran,Kanluran,,14.831838,120.60024,city_block
+Mabalacat,Mabalacat,,15.2250826,120.5733815,city
+"General Santos, South Cotabato",General Santos,South Cotabato,6.1122217,125.1721893,city
+Mapayapa,Mapayapa,,14.6185999,121.1778106,city_block
+Water Lily,Water Lily,,10.3919169,123.9761341,city_block
+GHQ Village,GHQ Village,,14.5196481,121.0592063,city_block
+Sitio Pulo,Sitio Pulo,,14.4300747,121.0000625,city_block
+Iligan,Iligan,,8.2281556,124.2411508,city
+Block 11,Block 11,,7.0751706,125.5236932,city_block
+Purok 2,Purok 2,,8.6199586,123.7127334,city_block
+Purok Dos,Purok Dos,,10.3757576,122.9962885,city_block
+Purok 1,Purok 1,,8.6210909,123.7127656,city_block
+Tabaco,Tabaco,,13.3593077,123.7302007,city
+Sanglay,Sanglay,,11.466069,121.9174882,city_block
+Tigbao,Tigbao,,11.4648118,121.912893,city_block
+Geronimo Compound,Geronimo Compound,,14.6790841,121.0517918,city_block
+Lasaran,Lasaran,,7.8409105,123.4278215,city_block
+"Boning, Occidental Mindoro",Boning,Occidental Mindoro,13.2107026,120.6079886,city_block
+"Purok 45, Occidental Mindoro",Purok 45,Occidental Mindoro,13.2234405,120.5924479,city_block
+DENR Tanay Housing project,DENR Tanay Housing project,,14.607844,121.3259743,city_block
+Bougainvilla,Bougainvilla,,10.3628488,123.9372416,city_block
+Ubos,Ubos,,9.6376534,123.855968,city_block
+"Tangub, Misamis Occidental",Tangub,Misamis Occidental,8.0609053,123.7512585,city
+Saranay,Saranay,,17.7755966,120.4247925,city_block
+"Paraiso, Occidental Mindoro",Paraiso,Occidental Mindoro,13.2222724,120.6012559,city_block
+"Charot, Occidental Mindoro",Charot,Occidental Mindoro,13.2207136,120.5986089,city_block
+"Masikap, Occidental Mindoro",Masikap,Occidental Mindoro,13.2216782,120.5987042,city_block
+"Bansutan, Occidental Mindoro",Bansutan,Occidental Mindoro,13.222051,120.599341,city_block
+"Calle 11, Occidental Mindoro",Calle 11,Occidental Mindoro,13.2230404,120.5991939,city_block
+"Bagong Silang, Occidental Mindoro",Bagong Silang,Occidental Mindoro,13.2199103,120.6084871,city_block
+"Pag-asa Kaliwa, Occidental Mindoro",Pag-asa Kaliwa,Occidental Mindoro,13.2171869,120.6067062,city_block
+"Pag-asa Kanan, Occidental Mindoro",Pag-asa Kanan,Occidental Mindoro,13.2139301,120.6057949,city_block
+"Maligaya, Occidental Mindoro",Maligaya,Occidental Mindoro,13.21986,120.6038288,city_block
+"Bagong Sikat, Occidental Mindoro",Bagong Sikat,Occidental Mindoro,13.2178116,120.5979239,city_block
+"Forestry, Occidental Mindoro",Forestry,Occidental Mindoro,13.216003,120.6081616,city_block
+"Airport, Occidental Mindoro",Airport,Occidental Mindoro,13.2099268,120.6038962,city_block
+"Seaside, Occidental Mindoro",Seaside,Occidental Mindoro,13.215613,120.5995306,city_block
+Purok 1A,Purok 1A,,10.9023918,123.060363,city_block
+Franco-Perez Compound,Franco-Perez Compound,,14.1804182,121.1988464,city_block
+Masaya,Masaya,,10.2530889,119.2069307,city_block
+Bagatnan,Bagatnan,,10.729057,122.3174064,city_block
+Tunga,Tunga,,10.7298173,122.3181623,city_block
+"Takas, Iloilo",Takas,Iloilo,10.7309436,122.3180498,city_block
+Natip,Natip,,10.7258066,122.3156012,city_block
+Durog,Durog,,10.7286126,122.3183601,city_block
+Divine Graceville,Divine Graceville,,14.7410079,121.0623015,city_block
+HACCCI Village,HACCCI Village,,14.7473306,121.0630945,city_block
+Mahogany,Mahogany,,10.9159464,123.4734803,city_block
+San Isidro,San Isidro,,6.6820176,122.0651612,city_block
+Zone Ⅱ,Zone Ⅱ,,10.9262607,125.0132633,city_block
+B17,B17,,14.3458069,120.9130232,city_block
+B1,B1,,14.3447588,120.9141821,city_block
+B11,B11,,14.3454035,120.9141486,city_block
+B12,B12,,14.3456675,120.9141589,city_block
+B3,B3,,14.3451357,120.9158205,city_block
+B4,B4,,14.3450903,120.9155588,city_block
+B5,B5,,14.3451297,120.9152895,city_block
+B8,B8,,14.3448148,120.9147747,city_block
+B9,B9,,14.3449896,120.9145097,city_block
+B13,B13,,14.3458516,120.9138348,city_block
+B14,B14,,14.3460945,120.9138051,city_block
+B15,B15,,14.3463225,120.9137921,city_block
+B10,B10,,14.3451848,120.9142609,city_block
+B16,B16,,14.3465347,120.913849,city_block
+B2,B2,,14.345117,120.9160651,city_block
+B6,B6,,14.3451648,120.9150212,city_block
+Rodfer III,Rodfer III,,14.5673722,121.111157,city_block
+Villa Stella 2,Villa Stella 2,,14.5685025,121.1114195,city_block
+DM 6,DM 6,,14.5670063,121.1127087,city_block
+"Cabadbaran, Agusan del Norte",Cabadbaran,Agusan del Norte,9.1232854,125.5322317,city
+Eastern Buyagan,Eastern Buyagan,,16.4602327,120.5836496,city_block
+Zone 1,Zone 1,,11.4883202,124.5966487,city_block
+Zone 2,Zone 2,,12.9436394,120.8914304,city_block
+Zone 4,Zone 4,,12.9326248,120.8659152,city_block
+Zone 3,Zone 3,,10.6820556,122.5391409,city_block
+587 Zone 58,587 Zone 58,,14.6017351,121.0156117,city_block
+Dalisay 1,Dalisay 1,,6.9304181,125.3220507,city_block
+Block 1A,Block 1A,,7.1050987,125.6077331,city_block
+Executive Homes 3,Executive Homes 3,,14.6124857,121.1101578,city_block
+4711 Heights,4711 Heights,,14.5702885,121.1122963,city_block
+Ramaville Subd,Ramaville Subd,,14.5673485,121.1118449,city_block
+Payatas B,Payatas B,,14.7095522,121.0983306,city_block
+UE Village,UE Village,,14.6271808,121.1055964,city_block
+Grande Valle,Grande Valle,,14.626721,121.1076924,city_block
+Grand Montana,Grand Montana,,14.6271052,121.1075167,city_block
+Elite Techno Park,Elite Techno Park,,14.5544609,120.98699,city_block
+Purok 4,Purok 4,,8.5011025,123.3021328,city_block
+Dubai,Dubai,,10.2790721,123.9602041,city_block
+Purok 15,Purok 15,,14.5000829,121.0572408,city_block
+Ipil,Ipil,,10.2405183,122.8570226,city_block
+Barra,Barra,,10.8027573,122.9687354,city_block
+Villa Angela,Villa Angela,,10.240312,122.8593256,city_block
+CKK,CKK,,10.7853648,122.9681067,city_block
+Purok 19,Purok 19,,9.9722358,122.6322091,city_block
+Santo Niño Subdivision,Santo Niño Subdivision,,10.6969118,122.4954299,city_block
+Block 22,Block 22,,14.8074884,121.0236339,city_block
+Block 20,Block 20,,14.8083041,121.0221987,city_block
+Charlie Mella Compound,Charlie Mella Compound,,14.4979468,121.0499587,city_block
+Metro Subdivision,Metro Subdivision,,14.7432111,121.0582834,city_block
+Area 5,Area 5,,14.6380395,121.0646353,city_block
+76,76,,14.731399,121.0676726,city_block
+59,59,,14.7276235,121.069669,city_block
+44,44,,7.0704905,125.6229094,city_block
+43,43,,7.0703693,125.6229108,city_block
+41,41,,14.7251397,121.0664083,city_block
+Cattleya Compound,Cattleya Compound,,14.562136,121.0888275,city_block
+45,45,,14.7251937,121.0679657,city_block
+42,42,,7.0702476,125.6229175,city_block
+Shining Hope Phase 1,Shining Hope Phase 1,,14.6878219,121.053549,city_block
+64,64,,14.7288631,121.0682196,city_block
+Rainbow Homes 2,Rainbow Homes 2,,14.7476166,121.0308411,city_block
+Area 6,Area 6,,14.6411676,121.067806,city_block
+San Pedro Compound 2 & 3,San Pedro Compound 2 & 3,,14.6823205,121.0386126,city_block
+Lemaville roque 1,Lemaville roque 1,,14.6880985,121.0540099,city_block
+Bernardino Gonzales Compound,Bernardino Gonzales Compound,,14.7274602,121.0354886,city_block
+Pag-asa Compound,Pag-asa Compound,,14.7267243,121.0343889,city_block
+Area 2,Area 2,,14.6832403,121.0678559,city_block
+Pingkian 3,Pingkian 3,,14.6887675,121.0595763,city_block
+Nawasa Line A-7,Nawasa Line A-7,,14.6909475,121.0697085,city_block
+Purok 16,Purok 16,,14.6949193,121.0752718,city_block
+Sampaloc Lower,Sampaloc Lower,,14.6801197,121.0473759,city_block
+78,78,,14.7314073,121.0667541,city_block
+46,46,,14.7252793,121.0683007,city_block
+35,35,,14.7241368,121.0647048,city_block
+Pabaya Compound,Pabaya Compound,,14.6935797,121.0272354,city_block
+Block 15,Block 15,,14.7295751,121.0456913,city_block
+Block 3,Block 3,,14.8071834,121.02073,city_block
+Block 13,Block 13,,14.584641,121.0382271,city_block
+Block 2,Block 2,,14.8074454,121.0218317,city_block
+Philvira Homes,Philvira Homes,,14.6726283,121.0312846,city_block
+Bagong Landas 7 Lower,Bagong Landas 7 Lower,,14.7268869,121.0361425,city_block
+Tarhaville,Tarhaville,,14.7080388,121.0490371,city_block
+Mirandaville,Mirandaville,,14.7349369,121.0415744,city_block
+Orchids,Orchids,,7.5944802,123.2452324,city_block
+Tapia Subdivision,Tapia Subdivision,,14.0862939,121.1450838,city_block
+Sitio Ⅲ,Sitio Ⅲ,,14.5822025,121.0303406,city_block
+Sitio IV,Sitio IV,,14.5854874,121.0322162,city_block
+Evergreen,Evergreen,,14.6772048,121.0489514,city_block
+Block 36,Block 36,,14.8095656,121.0241436,city_block
+Block 35,Block 35,,14.8094031,121.0244805,city_block
+Cleofas Compound,Cleofas Compound,,14.6709167,121.0331246,city_block
+Block 39-40,Block 39-40,,14.580472,121.0368416,city_block
+Martinez Compound,Martinez Compound,,14.4375063,121.0104454,city_block
+Ikasig,Ikasig,,10.2718985,123.9821994,city_block
+Gatan,Gatan,,7.8248059,123.3978206,city_block
+Kilayko,Kilayko,,10.7365567,122.9754296,city_block
+Star Apple,Star Apple,,10.6408,123.0200575,city_block
+Encarnacion,Encarnacion,,10.7373359,122.9688624,city_block
+Amor,Amor,,10.7368233,122.9695585,city_block
+Kalubihan,Kalubihan,,10.6897787,122.9941892,city_block
+Kaburihan,Kaburihan,,10.6879284,122.9922754,city_block
+Carvic,Carvic,,10.6903694,122.9602611,city_block
+Tuburan,Tuburan,,10.6905136,122.9647646,city_block
+Santol,Santol,,13.4350511,123.6779733,city_block
+Sambag,Sambag,,11.0678724,123.9372606,city_block
+Purok 14,Purok 14,,14.2041248,121.0996275,city_block
+Barangay 157,Barangay 157,,14.6182307,120.9736602,city_block
+Barangay 156,Barangay 156,,14.6180827,120.9727469,city_block
+Barangay 154,Barangay 154,,14.6193012,120.9721233,city_block
+Kulo,Kulo,,10.9175898,123.4885517,city_block
+Zone 5,Zone 5,,13.3027103,123.2392712,city_block
+34,34,,14.7224998,121.0646087,city_block
+33,33,,14.7220024,121.065172,city_block
+32,32,,14.7224284,121.0656685,city_block
+52,52,,14.7254213,121.0639563,city_block
+49,49,,14.7252179,121.065217,city_block
+56,56,,14.7281893,121.0635271,city_block
+82,82,,7.0705487,125.6244081,city_block
+54,54,,14.7270499,121.0635532,city_block
+86,86,,14.7290159,121.0639787,city_block
+81,81,,7.0704482,125.624323,city_block
+27,27,,14.7224145,121.067901,city_block
+75,75,,14.7314075,121.0681605,city_block
+65,65,,14.7295998,121.0687915,city_block
+26,26,,14.722385,121.0682455,city_block
+28,28,,14.722459,121.0673901,city_block
+50,50,,14.7252488,121.0648345,city_block
+40,40,,14.7251069,121.0660515,city_block
+29,29,,14.722457,121.0668909,city_block
+31,31,,14.722464,121.0661226,city_block
+51,51,,14.7253384,121.0644209,city_block
+53,53,,14.7254478,121.0635896,city_block
+39,39,,14.7241179,121.0655214,city_block
+30,30,,14.7224638,121.0665368,city_block
+57,57,,14.7274352,121.0648405,city_block
+80,80,,7.0703294,125.6242683,city_block
+85,85,,14.729036,121.0644298,city_block
+79,79,,7.0702692,125.6241764,city_block
+48,48,,14.7252258,121.0656287,city_block
+84,84,,14.7290454,121.0648592,city_block
+83,83,,14.7278597,121.0652564,city_block
+Zone 15,Zone 15,,10.6806745,122.5283316,city_block
+Rosal,Rosal,,15.6876236,120.8557419,city_block
+The Lucky HOA,The Lucky HOA,,14.7065794,121.1057122,city_block
+Purok 4A,Purok 4A,,14.671701,121.0682507,city_block
+Block 10,Block 10,,14.297002,120.9371433,city_block
+Block 1,Block 1,,14.8068804,121.0206621,city_block
+Block 12,Block 12,,14.8085379,121.0213461,city_block
+Block 25,Block 25,,14.8083978,121.0244091,city_block
+GK Blue Eagle,GK Blue Eagle,,14.7278043,121.1173099,city_block
+Block 21,Block 21,,14.8084812,121.0229452,city_block
+Block 28,Block 28,,14.8083696,121.0234294,city_block
+Block 30,Block 30,,14.8086406,121.0234529,city_block
+Block 23,Block 23,,6.0751044,125.1301253,city_block
+Block 31,Block 31,,14.8089038,121.0243607,city_block
+Block 24,Block 24,,14.8080395,121.0240893,city_block
+Block 27,Block 27,,14.8083089,121.0240655,city_block
+Block 29,Block 29,,14.8086557,121.0243605,city_block
+Block 26,Block 26,,14.8081304,121.0234125,city_block
+Block 9a,Block 9a,,7.0794182,125.5251982,city_block
+RMS Ville,RMS Ville,,14.6911125,121.0025999,city_block
+Graceland Homes,Graceland Homes,,14.6911358,121.0016973,city_block
+Masagana,Masagana,,15.4138185,119.9159123,city_block
+Avocado,Avocado,,10.6681325,122.9555001,city_block
+Bagong Hilway,Bagong Hilway,,10.6669499,122.9542913,city_block
+Gahili-ugyon,Gahili-ugyon,,10.6669252,122.9551551,city_block
+Masilinondob,Masilinondob,,10.6671999,122.9559435,city_block
+Nagabinuligay,Nagabinuligay,,10.6664091,122.9562093,city_block
+Mahinangpanon,Mahinangpanon,,10.6668348,122.9569329,city_block
+Masanag Dos,Masanag Dos,,10.6664246,122.9537337,city_block
+Masanag Uno,Masanag Uno,,10.6658972,122.9535304,city_block
+Mainuswagon,Mainuswagon,,10.6623429,122.9529497,city_block
+Santa Ana,Santa Ana,,10.6615573,122.953425,city_block
+Sunflower,Sunflower,,10.3738131,123.9846028,city_block
+Purok 11,Purok 11,,7.774799,122.8058276,city_block
+Maligaya Compound,Maligaya Compound,,14.5623566,121.0892098,city_block
+Dolliente Compound,Dolliente Compound,,14.4257647,121.4349266,city_block
+Villa Rosario,Villa Rosario,,14.5628075,121.0890237,city_block
+Pook Libis,Pook Libis,,14.6412035,121.0662024,city_block
+Purok Uno,Purok Uno,,10.3876326,122.9934789,city_block
+Purok 8,Purok 8,,10.3753249,123.961633,city_block
+Step-up,Step-up,,14.6627402,121.1319387,city_block
+Balinsayawan,Balinsayawan,,13.2282118,123.3107722,city_block
+Zone 6,Zone 6,,15.1020275,120.9795973,city_block
+Pag-asa,Pag-asa,,7.7072519,122.9930457,city_block
+Malipayon,Malipayon,,10.2423563,123.8330155,city_block
+Santan,Santan,,15.4335881,119.9168444,city_block
+Waling-waling,Waling-waling,,10.1872518,122.8669819,city_block
+Paghida-it,Paghida-it,,10.8319938,123.4235935,city_block
+Magkakaibigan,Magkakaibigan,,9.7392758,118.7338168,city_block
+Mabuhay,Mabuhay,,9.7390361,118.7299554,city_block
+Matiyaga,Matiyaga,,9.7411968,118.7301708,city_block
+Maligaya,Maligaya,,10.2582631,119.2098409,city_block
+Purok 2 Seaside,Purok 2 Seaside,,11.0123075,124.5799495,city_block
+Purok 7,Purok 7,,8.6209875,123.7097535,city_block
+Hipo,Hipo,,10.3028568,124.7925183,city_block
+Tres Hermanas Village Phase 3,Tres Hermanas Village Phase 3,,14.6278104,121.1297092,city_block
+Purok 10,Purok 10,,14.2800056,120.8652131,city_block
+Matinabangon,Matinabangon,,10.2621429,123.850092,city_block
+Matarik,Matarik,,14.7689631,121.041235,city_block
+Tanciong,Tanciong,,10.2723226,123.3206601,city_block
+Metroville 2,Metroville 2,,14.67692,121.0371588,city_block
+Pantalan,Pantalan,,8.6354269,123.3818172,city_block
+Tapal,Tapal,,10.061444,124.4731624,city_block
+Canibol,Canibol,,9.5950063,123.14304,city_block
+Petals Ville Phase Ⅱ,Petals Ville Phase Ⅱ,,10.7374879,122.5563687,city_block
+Bagong Barrio,Bagong Barrio,,14.6097235,121.0487245,city_block
+Block 34 Tower,Block 34 Tower,,14.5863142,121.0334668,city_block
+Kapit Bisig,Kapit Bisig,,14.5813267,121.045836,city_block
+Charcoal Ville,Charcoal Ville,,14.5719709,120.9974018,city_block
+Nicdao Compound,Nicdao Compound,,14.5429543,121.0707119,city_block
+Bisig ng Komunidad,Bisig ng Komunidad,,14.5418001,121.070979,city_block
+Lower Utod,Lower Utod,,10.7389791,124.7922063,city_block
+Upper Utod,Upper Utod,,10.7399132,124.7950856,city_block
+Casas Compound,Casas Compound,,14.5301841,121.0798073,city_block
+Cruz Ville,Cruz Ville,,14.530475,121.0799615,city_block
+Sunrise Ville,Sunrise Ville,,14.5315252,121.0823406,city_block
+Ashaiville,Ashaiville,,14.6726458,121.0691757,city_block
+Purok 5-A,Purok 5-A,,14.7079684,121.0893439,city_block
+Lower Paraiso,Lower Paraiso,,14.6569873,121.1145955,city_block
+Guevarra Compound,Guevarra Compound,,14.6589497,121.1291358,city_block
+F. Leonardo Compound,F. Leonardo Compound,,14.4394246,121.0030746,city_block
+Santa Ana Compound,Santa Ana Compound,,14.5058151,120.9968653,city_block
+Cherry Homes,Cherry Homes,,14.4975629,121.0138303,city_block
+Cluster 28,Cluster 28,,14.6248604,121.0161819,city_block
+Roxasville Subdivision,Roxasville Subdivision,,14.6768383,121.0523146,city_block
+Pilarville Subdivision,Pilarville Subdivision,,14.6759755,121.0372178,city_block
+Bagong Pag-asa,Bagong Pag-asa,,14.6571813,121.1014715,city_block
+Area 3-A,Area 3-A,,14.6936097,121.073897,city_block
+Area 1,Area 1,,14.6935915,121.0756753,city_block
+Balon,Balon,,14.6949961,121.0762627,city_block
+Plainville,Plainville,,14.7064209,121.0479735,city_block
+Cursillista Village,Cursillista Village,,14.70681,121.0491067,city_block
+Pagasa,Pagasa,,10.2554654,124.9847687,city_block
+Kapre,Kapre,,14.7216971,121.0250258,city_block
+De Leon Compound,De Leon Compound,,14.6895823,120.9886501,city_block
+Dose,Dose,,14.7028861,121.0875964,city_block
+Lower Everlasting,Lower Everlasting,,14.701729,121.0928012,city_block
+Nagkakaisang Molave HOA,Nagkakaisang Molave HOA,,14.7124533,121.096504,city_block
+Umambo,Umambo,,9.6308816,123.894437,city_block
+Happyland,Happyland,,14.7079214,121.0872456,city_block
+Asprer Step-up Community,Asprer Step-up Community,,14.711902,121.104723,city_block
+Blue Eagle GK Village,Blue Eagle GK Village,,14.7268179,121.1177619,city_block
+Parkwood Greens Executive Village Phase 4A,Parkwood Greens Executive Village Phase 4A,,14.5758764,121.0954177,city_block
+Saudi Compound,Saudi Compound,,14.5727454,121.0820559,city_block
+Batangas Line,Batangas Line,,14.5743283,120.9989893,city_block
+Gitna,Gitna,,14.6006878,121.0201389,city_block
+Likha,Likha,,14.6002387,121.0212634,city_block
+Purok 3 Redrying,Purok 3 Redrying,,16.5146057,120.3303981,city_block
+Pook Malinis,Pook Malinis,,14.6397233,121.0638669,city_block
+Floodway,Floodway,,14.5781647,121.0969895,city_block
+Pook Amorsolo,Pook Amorsolo,,14.6444723,121.0649452,city_block
+Purok Aguinaldo,Purok Aguinaldo,,14.6452067,121.0691052,city_block
+Dela Paz,Dela Paz,,14.6726384,121.083083,city_block
+Bukal,Bukal,,14.6821969,121.1018758,city_block
+Talanay Area C,Talanay Area C,,14.6809638,121.0965684,city_block
+Ron Bon Ville,Ron Bon Ville,,14.6912046,121.0071798,city_block
+Barrio Pagong,Barrio Pagong,,14.6355957,120.9731814,city_block
+Barangay 182,Barangay 182,,14.5304392,121.010908,city_block
+Barangay 180,Barangay 180,,14.5304665,121.011886,city_block
+Barangay 184,Barangay 184,,14.5294508,121.0086231,city_block
+Barangay 187,Barangay 187,,14.5338003,121.0004266,city_block
+Barangay 355,Barangay 355,,14.6174621,120.9799463,city_block
+Tiaong,Tiaong,,14.6314245,121.1134147,city_block
+Sampaguita Dreamland,Sampaguita Dreamland,,14.6336091,121.1195,city_block
+Supang,Supang,,16.9950688,120.8225727,city_block
+Papatayan,Papatayan,,16.9949303,120.8215937,city_block
+Katapag,Katapag,,16.9934887,120.8222187,city_block
+Patog-o,Patog-o,,16.9939196,120.8215293,city_block
+Lebkeng,Lebkeng,,16.9932732,120.821355,city_block
+Papacdean,Papacdean,,16.9979442,120.8225083,city_block
+Sagapa,Sagapa,,16.9952637,120.8197725,city_block
+Kaunlaran Village,Kaunlaran Village,,14.6474253,120.9710798,city_block
+3D 9,3D 9,,13.9376902,121.6341642,city_block
+Libis,Libis,,14.6886002,121.0051787,city_block
+Barrio Cadre,Barrio Cadre,,14.6834416,120.5205452,city_block
+Dawis Tumoy,Dawis Tumoy,,10.2635444,123.8513607,city_block
+B22,B22,,13.9636154,121.5581144,city_block
+B23,B23,,13.9634395,121.557976,city_block
+B24,B24,,13.9633106,121.5578023,city_block
+B25,B25,,13.9632464,121.5575138,city_block
+B26,B26,,13.9630831,121.5573155,city_block
+B27,B27,,13.9630715,121.5571232,city_block
+B28,B28,,13.9627682,121.5577377,city_block
+Vega Ville,Vega Ville,,14.5557399,121.090516,city_block
+Jimogaon,Jimogaon,,10.7382152,122.5371024,city_block
+Samahang Maralita,Samahang Maralita,,14.5144377,121.0523543,city_block
+Herminia Ville,Herminia Ville,,9.6665501,123.8469994,city_block
+Marietta Homes,Marietta Homes,,9.6854961,123.8638088,city_block
+Molave,Molave,,13.9084286,121.1391025,city_block
+S. C. Johnson - GK Housing,S. C. Johnson - GK Housing,,14.5439383,121.0723923,city_block
+Marcelino Compound,Marcelino Compound,,14.5325962,121.0817921,city_block
+Remeville,Remeville,,14.5094793,121.0627538,city_block
+Sanalugta,Sanalugta,,14.5106219,121.0614851,city_block
+Panam,Panam,,14.5141273,121.0584851,city_block
+Siwang,Siwang,,14.5454791,121.120371,city_block
+Sapaka,Sapaka,,14.5031609,121.0596263,city_block
+Zephyr Homes,Zephyr Homes,,14.5362649,121.0117543,city_block
+Tia Salud Subdivision,Tia Salud Subdivision,,14.5072851,120.9960124,city_block
+Nayong Tsinoy,Nayong Tsinoy,,14.7723865,121.0604427,city_block
+Carmelite Village,Carmelite Village,,14.7667925,121.0553891,city_block
+Matatag,Matatag,,14.5149842,121.0394347,city_block
+Dama de Noche,Dama de Noche,,13.9592421,121.594137,city_block
+Ibayo Barangay Uno,Ibayo Barangay Uno,,14.468508,121.4218372,city_block
+Zone 9,Zone 9,,14.3396186,121.4813782,city_block
+Santa Elena,Santa Elena,,14.2497386,121.3988011,city_block
+Ilang-ilang,Ilang-ilang,,13.9635616,121.6489229,city_block
+Minahan Libis,Minahan Libis,,14.652671,121.0952732,city_block
+Seacom,Seacom,,14.4597697,121.0385415,city_block
+Lopena Sportsville,Lopena Sportsville,,14.4635389,121.0348716,city_block
+Annex 46,Annex 46,,14.4774653,121.0241675,city_block
+Malacañang Dulo,Malacañang Dulo,,14.4785457,121.0245511,city_block
+Talampas Compound,Talampas Compound,,14.4429272,121.004118,city_block
+Iwahig,Iwahig,,14.6593424,121.0998815,city_block
+Suburbia East Phase 3,Suburbia East Phase 3,,14.6538805,121.1060822,city_block
+Suburbia East Phase 1,Suburbia East Phase 1,,14.6547486,121.1088422,city_block
+Suburbia East Phase 2,Suburbia East Phase 2,,14.6532331,121.1078149,city_block
+Paghidaet,Paghidaet,,10.6929463,122.5493051,city_block
+Zone 7,Zone 7,,10.431981,122.9167101,city_block
+Zone 1-B,Zone 1-B,,11.1072113,125.0028773,city_block
+Zone 1-A,Zone 1-A,,10.6859766,122.5453247,city_block
+Zone 8,Zone 8,,10.6815878,122.5365137,city_block
+Villa Leyson - Phase 2A,Villa Leyson - Phase 2A,,10.3847983,123.9188254,city_block
+Manihihon,Manihihon,,10.7793127,122.9661369,city_block
+Golf,Golf,,10.7773174,122.9642886,city_block
+Mambucog,Mambucog,,10.7536929,122.9652782,city_block
+Tramo,Tramo,,15.0776789,120.7613245,city_block
+Lerio,Lerio,,9.6912342,126.0073371,city_block
+Banana Hills,Banana Hills,,11.913167,124.4221213,city_block
+Seaside,Seaside,,13.0873918,120.7145213,city_block
+B29,B29,,13.9625802,121.5578674,city_block
+Señorita,Señorita,,10.3574304,123.926547,city_block
+Reymar,Reymar,,14.6808334,121.037995,city_block
+Liwliwa,Liwliwa,,6.0635009,124.4947842,city_block
+Panday Pira,Panday Pira,,15.1822085,120.586702,city_block
+Muntindilaw,Muntindilaw,,14.6065758,121.130324,city_block
+F. Reyes Compound,F. Reyes Compound,,14.687113,120.9716532,city_block
+Celebrity Ville HOA,Celebrity Ville HOA,,14.6877211,121.0535466,city_block
+Catlleya,Catlleya,,10.2503543,123.8081704,city_block
+Pag-laum,Pag-laum,,10.2656255,123.8488461,city_block
+Fatima,Fatima,,10.3389214,123.8958129,city_block
+Tadlik,Tadlik,,14.1856866,121.7316545,city_block
+Abandon,Abandon,,14.1827475,121.7278974,city_block
+Block 37,Block 37,,14.809729,121.0245038,city_block
+Block 72,Block 72,,14.6527418,121.1019892,city_block
+Tulip,Tulip,,14.6520465,121.1012698,city_block
+Pinquian Ⅱ,Pinquian Ⅱ,,14.6834637,121.0561354,city_block
+91,91,,14.7343699,121.0679708,city_block
+Barilan,Barilan,,14.4874793,121.2244773,city_block
+Phase II-B Upper,Phase II-B Upper,,14.5071527,121.1906335,city_block
+Phase 1-B,Phase 1-B,,14.5070255,121.1927538,city_block
+Phase II-B Lower,Phase II-B Lower,,14.5065477,121.1890751,city_block
+Phase 4-A,Phase 4-A,,14.5064204,121.1962145,city_block
+22,22,,14.7204198,121.0677058,city_block
+24,24,,14.720891,121.0676817,city_block
+88,88,,14.7317933,121.0653381,city_block
+87,87,,14.728973,121.063545,city_block
+63,63,,14.7285782,121.0685274,city_block
+62,62,,14.7283525,121.0688454,city_block
+61,61,,14.7280793,121.0690925,city_block
+60,60,,14.72784,121.0693809,city_block
+68,68,,14.7304054,121.0706841,city_block
+69,69,,14.7304397,121.0703332,city_block
+70,70,,14.7304808,121.069973,city_block
+71,71,,14.7305722,121.0695901,city_block
+72,72,,14.7306429,121.0691375,city_block
+77,77,,14.7314101,121.0671674,city_block
+38,38,,14.7233198,121.0651718,city_block
+Block 33,Block 33,,14.8089684,121.0237117,city_block
+Block 32,Block 32,,14.8088775,121.0232823,city_block
+Block 34,Block 34,,14.8091629,121.0244551,city_block
+Block 18,Block 18,,14.8095374,121.0205881,city_block
+Dalisay 2,Dalisay 2,,6.9293451,125.3245264,city_block
+Pook Maligaya,Pook Maligaya,,14.5638734,121.0721456,city_block
+Villa Reyes Manalo,Villa Reyes Manalo,,14.5560248,121.0791582,city_block
+Centennial,Centennial,,14.5586495,121.0884359,city_block
+Lornaville,Lornaville,,14.5586345,121.0886619,city_block
+Cattleya,Cattleya,,14.5591148,121.089879,city_block
+Rocha-5,Rocha-5,,14.5882138,121.0869984,city_block
+Durian,Durian,,14.6956606,121.6106599,city_block
+Sagrada Familia,Sagrada Familia,,14.6469279,120.99399,city_block
+Makulay,Makulay,,10.2421601,123.8337069,city_block
+Maharlika,Maharlika,,10.3273147,123.9311898,city_block
+Cabasag,Cabasag,,17.8009284,121.319515,city_block
+Zone Ⅵ,Zone Ⅵ,,17.4798649,120.4887309,city_block
+Madaun,Madaun,,17.0569231,120.7814893,city_block
+Banal,Banal,,14.4054729,120.8532196,city_block
+Madasigon,Madasigon,,7.8360591,123.4247097,city_block
+Purok 10 Manlavi,Purok 10 Manlavi,,9.7364165,118.7462854,city_block
+Sampaguita,Sampaguita,,12.934741,121.4713347,city_block
+Lagubo,Lagubo,,10.3872926,123.2174373,city_block
+Balilahan,Balilahan,,9.0667384,126.196585,city_block
+Lubak,Lubak,,14.6347282,121.1090159,city_block
+Kapayasan,Kapayasan,,10.2397279,123.8043724,city_block
+Upper Pailob,Upper Pailob,,10.303506,123.8885777,city_block
+Base,Base,,9.0441708,117.6361728,city_block
+Liwayway,Liwayway,,9.0420199,117.6329353,city_block
+Bolo-bolo,Bolo-bolo,,9.2114312,118.0431376,city_block
+Maganda,Maganda,,6.6763813,122.061819,city_block
+Marangal,Marangal,,6.6748029,122.0628811,city_block
+Mahinhin,Mahinhin,,6.6776747,122.063431,city_block
+Switch,Switch,,6.6803187,122.0641968,city_block
+Marikit,Marikit,,6.6785778,122.0593527,city_block
+Karilagan,Karilagan,,6.6757433,122.0602298,city_block
+Paraluman,Paraluman,,6.6733404,122.0601252,city_block
+San Francisco,San Francisco,,7.5758983,123.16451,city_block
+Padang-padang,Padang-padang,,7.7109824,123.1062014,city_block
+Orchid,Orchid,,7.7202951,123.006141,city_block
+Caimito,Caimito,,7.5904988,123.2362007,city_block
+Papaya,Papaya,,7.591533,123.2379851,city_block
+Santo Niño,Santo Niño,,7.5265954,123.3442837,city_block
+Cansaway,Cansaway,,9.4481808,122.9678303,city_block
+Bactolon,Bactolon,,9.820387,122.549918,city_block
+Proper,Proper,,10.2743864,124.0592895,city_block
+Dalawidaw,Dalawidaw,,10.021331,122.8215873,city_block
+Malinong,Malinong,,10.0216841,122.8233886,city_block
+Catali,Catali,,10.0448599,122.8148317,city_block
+Paho,Paho,,10.2865582,123.0486895,city_block
+Bougainvillea,Bougainvillea,,10.3739945,123.9506219,city_block
+Lampunaya,Lampunaya,,10.4147948,123.0241862,city_block
+China Rose,China Rose,,10.4158843,123.022711,city_block
+Million Flowers,Million Flowers,,10.4156337,123.0211741,city_block
+Aure,Aure,,10.5092558,122.8271417,city_block
+Malunggay,Malunggay,,10.5127963,122.8979634,city_block
+Eshoa,Eshoa,,10.5158857,122.8088745,city_block
+San Luis,San Luis,,10.59962,122.9205376,city_block
+Balunggay,Balunggay,,10.6039477,123.0416138,city_block
+Golden Camote,Golden Camote,,10.6041441,123.0420309,city_block
+Kapayas,Kapayas,,10.6044815,123.0436054,city_block
+Masinadyahon,Masinadyahon,,10.6040043,123.0449894,city_block
+Porferia,Porferia,,10.694805,122.9641476,city_block
+Bon-bon,Bon-bon,,10.8202259,123.0398637,city_block
+Kapawa,Kapawa,,10.8408587,123.0576374,city_block
+Hacienda Gaston,Hacienda Gaston,,10.8473279,123.0988964,city_block
+Egan,Egan,,16.9997298,120.8148299,city_block
+Zufermin,Zufermin,,10.8335773,123.2959583,city_block
+Mahidaiton,Mahidaiton,,10.8705081,123.3450803,city_block
+Mabinuligon,Mabinuligon,,10.8313908,123.4236992,city_block
+Atis,Atis,,10.9173449,123.4870014,city_block
+Tambis,Tambis,,10.9180073,123.4734723,city_block
+Zone Ⅴ,Zone Ⅴ,,10.9583654,125.0350182,city_block
+NPC Area A,NPC Area A,,14.6872245,121.014592,city_block
+NPC Area B,NPC Area B,,14.689116,121.0141629,city_block
+Paglaum,Paglaum,,10.5382098,123.0833128,city_block
+Narra,Narra,,10.5674689,123.0770519,city_block
+Lawis,Lawis,,10.1539369,124.2060319,city_block
+Nangka,Nangka,,7.8390165,123.423205,city_block
+Hasa-hasa,Hasa-hasa,,9.6244821,123.9226457,city_block
+Sipat,Sipat,,14.8849172,120.8537386,city_block
+Cebasca,Cebasca,,9.3013154,123.293315,city_block
+Malipayun,Malipayun,,9.7491565,123.3956608,city_block
+San Roque,San Roque,,9.7494689,123.3965814,city_block
+Talong,Talong,,7.8356127,123.4222475,city_block
+Kalabasa,Kalabasa,,9.7704667,123.4300286,city_block
+Karot,Karot,,9.7769388,123.4301613,city_block
+Tinabangay,Tinabangay,,9.3179513,123.2900092,city_block
+Lemon,Lemon,,10.4340201,125.000077,city_block
+Rosas,Rosas,,10.2545561,123.8130529,city_block
+Isla Noah,Isla Noah,,10.2592265,123.8679475,city_block
+Tuklas Ⅱ,Tuklas Ⅱ,,14.3332051,121.0557961,city_block
+Gabi,Gabi,,9.301587,123.3017251,city_block
+Calachuchi,Calachuchi,,10.3627318,123.9824952,city_block
+Adelfa,Adelfa,,10.373643,123.9483359,city_block
+Judaya,Judaya,,10.3588321,123.9842219,city_block
+Upper Lanipga,Upper Lanipga,,10.4577507,123.9328556,city_block
+Inanama,Inanama,,17.7814265,120.4132837,city_block
+Poblacion,Poblacion,,10.2634349,123.9713077,city_block
+Mangga Dos,Mangga Dos,,10.4325258,124.0018299,city_block
+Gemelina,Gemelina,,7.8266593,123.3972439,city_block
+Kapitan Ano,Kapitan Ano,,9.2777472,123.2880356,city_block
+Bliss,Bliss,,9.2915867,123.2631375,city_block
+Daisy,Daisy,,9.6377147,122.4702483,city_block
+Everlasting,Everlasting,,9.6367337,122.4718416,city_block
+Tamsi,Tamsi,,9.2985589,123.1726626,city_block
+Colon,Colon,,9.3043835,123.3015642,city_block
+Baltimar,Baltimar,,9.3028469,123.301532,city_block
+Manzanitas,Manzanitas,,9.3014904,123.3079538,city_block
+Zone 02,Zone 02,,9.3140082,123.3100775,city_block
+Tikling,Tikling,,9.3245035,123.288196,city_block
+Extension,Extension,,12.3709529,121.0328874,city_block
+Quezon,Quezon,,7.6882071,122.9838109,city_block
+Sili,Sili,,9.589075,123.8293545,city_block
+Bugtong,Bugtong,,10.0389977,124.1156629,city_block
+Gumamela,Gumamela,,10.38208,124.97645,city_block
+Saging,Saging,,10.163518,123.5631573,city_block
+Sayaw-sayaw,Sayaw-sayaw,,10.1635972,123.7063833,city_block
+Proper 1,Proper 1,,10.2163623,123.7536062,city_block
+Tipay,Tipay,,10.2406108,123.7894875,city_block
+San Lorenzo,San Lorenzo,,10.2441912,123.7989691,city_block
+Pinya,Pinya,,11.0347904,123.9279027,city_block
+Kamansi,Kamansi,,11.0121345,123.9286829,city_block
+Indian Tree,Indian Tree,,11.0529834,123.9368251,city_block
+Purok 32,Purok 32,,14.5551545,121.1654811,city_block
+Kamunggay,Kamunggay,,10.3456922,123.9577096,city_block
+Ubi,Ubi,,10.3453676,123.9594141,city_block
+Mahayahay,Mahayahay,,10.3925845,123.6458243,city_block
+Summit,Summit,,13.9180773,121.9971362,city_block
+Son-oc,Son-oc,,10.3772694,123.9170614,city_block
+Tindalo,Tindalo,,10.1957378,122.8661719,city_block
+Block 17,Block 17,,14.5933421,120.9612147,city_block
+Purok Sais,Purok Sais,,10.4046937,122.9998961,city_block
+Purok Tres,Purok Tres,,10.4058769,122.9968263,city_block
+Purok Ⅴ,Purok Ⅴ,,10.3755479,122.9829486,city_block
+San Gabriel,San Gabriel,,10.5327815,122.8426543,city_block
+Matawhay,Matawhay,,10.9573871,123.3070037,city_block
+Libutad,Libutad,,15.0779379,120.7677644,city_block
+Pagsanghan,Pagsanghan,,11.6247652,122.3648228,city_block
+"Alta Tierra Homes, Phase 4","Alta Tierra Homes, Phase 4",,14.3162257,121.0083586,city_block
+Bangga Singko,Bangga Singko,,10.7445581,122.5162603,city_block
+Suraya Homes Phase 2,Suraya Homes Phase 2,,7.1367409,125.6110266,city_block
+Suraya Homes Phase 1,Suraya Homes Phase 1,,7.1347142,125.6139073,city_block
+Masikap,Masikap,,14.1446971,121.472429,city_block
+Purok C,Purok C,,10.4158784,125.1891205,city_block
+Mangga,Mangga,,10.4338196,124.998858,city_block
+Tisa,Tisa,,10.0321254,125.0045402,city_block
+Mabolo,Mabolo,,10.0326193,125.0048366,city_block
+Ticab,Ticab,,10.3733545,124.7423869,city_block
+Mambad,Mambad,,10.3764237,124.7410619,city_block
+Tanguinge,Tanguinge,,10.3740052,124.7417481,city_block
+Santa Cruz,Santa Cruz,,10.3456606,124.8674346,city_block
+Zone Ⅲ,Zone Ⅲ,,10.958896,125.0336281,city_block
+Lapu-lapu,Lapu-lapu,,11.2019013,125.0245951,city_block
+Tilang,Tilang,,11.2077285,125.0232755,city_block
+Arandaman,Arandaman,,11.4325168,122.0585783,city_block
+Marawi City,Marawi City,,8.0038554,124.2803278,city
+Pulo,Pulo,,14.8633166,120.839999,city_block
+Bunga,Bunga,,14.8636717,120.8420549,city_block
+Agao,Agao,,8.9438935,125.5446205,city_block
+Alugbati,Alugbati,,9.4884108,123.3216351,city_block
+Tambak Ⅱ,Tambak Ⅱ,,14.6749623,120.9380633,city_block
+Camote 2,Camote 2,,10.3868609,124.0104572,city_block
+Gemilina,Gemilina,,10.3820012,124.000065,city_block
+Zinnia 1,Zinnia 1,,10.3616375,123.98022,city_block
+Cranberry,Cranberry,,10.3809497,123.9784457,city_block
+Ibabaw,Ibabaw,,10.3759819,123.9556845,city_block
+Ronquillo Compound,Ronquillo Compound,,14.4691404,120.8873534,city_block
+Green Valley,Green Valley,,8.2248884,124.2484671,city_block
+Green Hills,Green Hills,,8.2246097,124.2501032,city_block
+Purok 17,Purok 17,,8.2233806,124.2567752,city_block
+Purok 14-A,Purok 14-A,,8.2224505,124.2527682,city_block
+Pagkakaisa,Pagkakaisa,,15.4130118,119.9147697,city_block
+Langka,Langka,,14.0145934,121.903692,city_block
+Cauayan,Cauayan,,16.9335594,121.7743969,city
+Licar,Licar,,13.5894778,122.3252092,city_block
+Zone 6-A,Zone 6-A,,12.9284473,120.8388256,city_block
+Hermit Crab,Hermit Crab,,10.2412128,123.7923571,city_block
+Purok 3-A,Purok 3-A,,12.3571724,121.0651566,city_block
+Purok 1-B,Purok 1-B,,7.746139,123.036629,city_block
+Fatima 2,Fatima 2,,14.6606332,121.0748137,city_block
+Rizal,Rizal,,7.6838105,122.9851212,city_block
+Zamboco,Zamboco,,7.7059588,122.9959278,city_block
+Mahigugmaon,Mahigugmaon,,7.7017711,122.9869142,city_block
+Magsaysay,Magsaysay,,7.7110182,122.9943144,city_block
+Quirino,Quirino,,7.7312754,123.058607,city_block
+Acacia,Acacia,,7.8182597,123.3714478,city_block
+Golden Spring,Golden Spring,,7.7323664,123.4714472,city_block
+Bagong Silang,Bagong Silang,,7.7842146,123.4132299,city_block
+Marang,Marang,,7.7966701,123.356135,city_block
+Arabic,Arabic,,7.8364922,123.425568,city_block
+Rubia,Rubia,,7.8274046,123.3973123,city_block
+Upo,Upo,,7.8362956,123.4105021,city_block
+Kapalaran,Kapalaran,,7.83599,123.413769,city_block
+Patag,Patag,,7.8396217,123.42855,city_block
+Purok 13,Purok 13,,14.2047216,121.0988201,city_block
+Jose Andag Ⅱ,Jose Andag Ⅱ,,8.6678053,123.4651711,city_block
+Sentro,Sentro,,8.6528037,123.4829968,city_block
