@@ -26,10 +26,9 @@ interface LocationForecast {
   city?: string
   predictions: {
     wind_speed_ms: number
-    precipitation_mm: number
+    chance_of_rain?: number
     temperature_c: number
     humidity_percent: number
-    chance_of_rain?: number
   }
   assessment: {
     wind: {
@@ -70,11 +69,10 @@ interface MultipleForecast {
     hour: number
     city?: string
     predictions: {
-      wind_speed_ms: number
-      precipitation_mm: number
-      temperature_c: number
-      humidity_percent: number
-      chance_of_rain?: number
+        wind_speed_ms: number
+        chance_of_rain?: number
+        temperature_c: number
+        humidity_percent: number
     }
     assessment: any
   }>
