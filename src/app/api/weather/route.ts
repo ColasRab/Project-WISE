@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from "next/server"
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
-    const { city, target_date, target_hour } = body
+  const { city, target_date, target_hour } = body
 
     console.log("Received request:", { city, target_date, target_hour })
 
@@ -16,25 +16,55 @@ export async function POST(request: NextRequest) {
     }
 
     const backendUrl = process.env.BACKEND_URL || "https://project-wise.onrender.com"
-    
+
+    // Validate and normalize date to YYYY-MM-DD
+    const dateStrRaw = String(target_date)
+    const dateMatch = dateStrRaw.match(/^(\d{4})-(\d{1,2})-(\d{1,2})$/)
+    let normalizedDate = ""
+    if (dateMatch) {
+      const y = Number(dateMatch[1])
+      const m = Number(dateMatch[2])
+      const d = Number(dateMatch[3])
+      const dt = new Date(Date.UTC(y, m - 1, d))
+      // Check the date components match (to catch invalid dates like 2025-02-30)
+      if (dt.getUTCFullYear() === y && dt.getUTCMonth() === m - 1 && dt.getUTCDate() === d) {
+        // format YYYY-MM-DD
+        const mm = String(m).padStart(2, "0")
+        const dd = String(d).padStart(2, "0")
+        normalizedDate = `${y}-${mm}-${dd}`
+      }
+    }
+
+    if (!normalizedDate) {
+      return NextResponse.json({ error: "Invalid date format. Use YYYY-MM-DD" }, { status: 400 })
+    }
+
     const url = new URL("/api/weather", backendUrl)
-    // Send city name to the backend (preferred). If city is missing fall back to lat/lon.
+    // Send city name to the backend (preferred).
     url.searchParams.set("city", String(city))
-    url.searchParams.set("target_date", target_date)
+    url.searchParams.set("target_date", normalizedDate)
     url.searchParams.set("target_hour", target_hour || "all")
+
+    // Add explicit model/target_variable so backend can pick correct model name
+    const cityModelPrefix = String(city).toLowerCase().replace(/\s+/g, "_")
+    // Some backends expect model names like 'manila_chance_of' while others want 'manila_chance_of_rain'
+    // We'll send both hints: `model` and `target_variable`.
+    url.searchParams.set("model", `${cityModelPrefix}_chance_of`)
+    url.searchParams.set("target_variable", "chance_of_rain")
 
     console.log("Calling backend:", url.toString())
 
-    const response = await fetch(url.toString(), {
+    let response = await fetch(url.toString(), {
       method: "GET",
       headers: { "Content-Type": "application/json" },
       signal: AbortSignal.timeout(30000),
     })
 
-    const responseText = await response.text()
+    let responseText = await response.text()
     console.log("Backend response status:", response.status)
     console.log("Backend response body:", responseText)
 
+    // If backend complains about missing model, retry with an alternate model name
     if (!response.ok) {
       let errorData
       try {
