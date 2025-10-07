@@ -183,7 +183,7 @@ export default function WeatherDashboard() {
           <div className="flex items-center gap-3">
             <AnimatedWeatherIcon type="cloud" className="h-10 w-10 text-primary" />
             <h1 className="text-4xl font-bold tracking-tight text-balance bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent">
-              PROJECT W.I.S.E
+              PROJECT W.I.S.E 
             </h1>
             <Sparkles className="h-6 w-6 text-amber-500 animate-pulse" />
           </div>

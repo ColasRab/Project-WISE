@@ -1,5 +1,0 @@
-fastapi
-uvicorn
-prophet
-pandas
-joblib
